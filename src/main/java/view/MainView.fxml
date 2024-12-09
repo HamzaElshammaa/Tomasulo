@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.SimulationController">
+    <MenuBar>
+        <Menu text="File">
+            <MenuItem text="Load Instructions" onAction="#loadInstructions"/>
+            <MenuItem text="Configure" onAction="#showConfiguration"/>
+        </Menu>
+    </MenuBar>
+    
+    <HBox spacing="10">
+        <TableView fx:id="reservationStationsTable"/>
+        <TableView fx:id="registerFileTable"/>
+        <TableView fx:id="cacheTable"/>
+    </HBox>
+    
+    <HBox spacing="10">
+        <Button text="Next Cycle" onAction="#nextCycle"/>
+        <Button text="Run All" onAction="#runAll"/>
+    </HBox>
+</VBox> 
