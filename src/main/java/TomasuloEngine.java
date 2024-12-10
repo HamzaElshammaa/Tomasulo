@@ -1,19 +1,36 @@
+import model.InstructionQueue;
+import model.RegisterFile;
+
 public class TomasuloEngine {
     //memory variables
-    int blockSize;
-    int cacheSize;
-    int missPenalty;
+    static int blockSize;
+    static int cacheSize;
+    static int missPenalty;
 
     //latencies
-    int additionUnitLatency; //for FP ADD & SUB
-    int multiplicationUnitLatency; //for FP MUL & DIV
+    static int additionUnitLatency; //for FP ADD & SUB
+    static int multiplicationUnitLatency; //for FP MUL & DIV
 
     //RS sizes
-    int additionUnitSize;
-    int multiplicationUnitSize;
+    static int additionUnitSize;
+    static int multiplicationUnitSize;
 
     //other
-    int clockCycle = 0;
+    static int clockCycle = 0;
+    static String instructionsFilePath;
+    static String registerContentsFilePath;
+
+    public static void init(){
+        InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
+    }
+
+
+
+
+    public static void Main (String[] args) {
+
+    }
+
 
 
 }
