@@ -11,7 +11,6 @@ public class TomasuloEngine {
     //RS sizes
     int additionUnitSize;
     int multiplicationUnitSize;
-    int latencyCycle;
 
     //other
     int clockCycle = 0;
