@@ -11,12 +11,13 @@ public class RegisterFile {
     
     private class Register {
         private double value;
-        private String qi;  // Name of reservation station producing result, null if value is ready
+        private String Qi;  // Name of reservation station producing result, null if value is ready
 
         public Register() {
             this.value = 0.0;
-            this.qi = null;
+            this.Qi = null;
         }
+
     }
 
     private Register[] integerRegisters;

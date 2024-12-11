@@ -1,5 +1,8 @@
 import model.InstructionQueue;
 import model.RegisterFile;
+import model.ReservationStation;
+
+//ANYTHING THAT GOES ON THE BUS NEEDS TO COMMUNICATE WITH THE PERSON DOING THE BUS
 
 public class TomasuloEngine {
     //memory variables
@@ -20,8 +23,16 @@ public class TomasuloEngine {
     static String instructionsFilePath;
     static String registerContentsFilePath;
 
+    //RS
+    static ReservationStation []  additionUnitStations;
+    static ReservationStation []  multiplicationUnitStations;
+
     public static void init(){
         InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
+        //call reg file
+        additionUnitStations = new ReservationStation[additionUnitSize];
+        multiplicationUnitStations = new ReservationStation[multiplicationUnitSize];
+
     }
 
 

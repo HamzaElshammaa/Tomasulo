@@ -1,5 +1,7 @@
 package model;
 
+//NEED COMMUNICATION WITH BUS!!!!!!!!!!!
+
 public class ReservationStation {
     public enum Type{
         ADD,
@@ -9,26 +11,30 @@ public class ReservationStation {
         INT
     }
 
-
+    private int latency;
     private String name; //Name of station
     private Type type; //Type of station ? ex : mult or add 
     private boolean busy; //if station is in use
     private String operation; //operation to preform
     private double vj; //first operand
     private double vk; //second operand
-    private String qj; //queue first operand
-    private String qk; //queue second operand
+    //////////////////////////////////////////////////////CHANGED TYPEE///////////////////////////////////////////////////
+    private Q qj; //queue first operand
+    private Q qk; //queue second operand
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int address; // For load/store operations
     private int cycles; //remaining execution cycles
     private double result; //computed result
     private boolean resultReady; //if execution is done or not
 
 
-    public ReservationStation(String name, Type type) {
+    public ReservationStation(String name, Type type, int latency) {
         this.name = name;
         this.type = type;
         this.busy = false;
         this.resultReady = false;
+        this.latency = latency;
+
         clear();
     }
     
@@ -46,10 +52,10 @@ public class ReservationStation {
 
     }
 
-    public void issue(String operation, int cycles){
+    public void issue(String operation){ //given already in constructor
         this.busy = true;
         this.operation = operation;
-        this.cycles = cycles;
+        this.cycles = latency;
         this.resultReady = false;
         this.result = -1;
     }
@@ -109,14 +115,14 @@ public class ReservationStation {
     }
 
     public void updateOperand(String rsName, double value){
-        if(rsName.equals(qj)){
-            vj = value;
-            qj = null;
-        }
-        if(rsName.equals(qk)){
-            vk = value;
-            qk = null;
-        }
+//        if(rsName.equals(qj)){
+//            vj = value;
+//            qj = null;
+//        }
+//        if(rsName.equals(qk)){
+//            vk = value;
+//            qk = null;
+//        }
     }
     // Getters and setters
     public String getName() { return name; }
@@ -125,8 +131,8 @@ public class ReservationStation {
     public String getOperation() { return operation; }
     public Double getVj() { return vj; }
     public Double getVk() { return vk; }
-    public String getQj() { return qj; }
-    public String getQk() { return qk; }
+    public Q getQj() { return qj; }
+    public Q getQk() { return qk; }
     public Integer getAddress() { return address; }
     public Integer getCycles() { return cycles; }
     public Double getResult() { return result; }
@@ -134,8 +140,8 @@ public class ReservationStation {
 
     public void setVj(Double vj) { this.vj = vj; }
     public void setVk(Double vk) { this.vk = vk; }
-    public void setQj(String qj) { this.qj = qj; }
-    public void setQk(String qk) { this.qk = qk; }
+    public void setQj(Q qj) { this.qj = qj; }
+    public void setQk(Q qk) { this.qk = qk; }
     public void setAddress(Integer address) { this.address = address; }
 
    // State class for GUI display

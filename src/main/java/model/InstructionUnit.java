@@ -17,11 +17,11 @@ public class InstructionUnit {
     private InstructionType type;    // Type of instruction
     
     // Execution status
-    private int issueTime;           // Cycle when instruction was issued
+    private int issueTime;           // Cycle when instruction was issued //DON'T NEED ITT
     private int startTime;           // Cycle when execution started
     private int completeTime;        // Cycle when execution completed
     private int writeTime;           // Cycle when result was written
-    private int totalLatency;        // Total cycles needed for execution
+    private int totalLatency;        // Total cycles needed for execution //DON'T NEED IT
     private String assignedStation;   // Assigned reservation station
     private boolean isExecuting;     // Whether instruction is currently executing
     private boolean isComplete;      // Whether instruction has completed execution
@@ -36,9 +36,9 @@ public class InstructionUnit {
         this.type = determineType(operation);
         
         // Initialize execution status
-        this.issueTime = -1;
+//        this.issueTime = -1; DON'T NEED IT
         this.startTime = -1;
-        this.completeTime = -1;
+//        this.completeTime = -1;
         this.writeTime = -1;
         this.isExecuting = false;
         this.isComplete = false;
