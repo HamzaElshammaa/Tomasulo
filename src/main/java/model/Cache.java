@@ -2,6 +2,7 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
+//cash
 public class Cache {
     private final int cacheSize;      // in bytes
     private final int blockSize;      // in bytes
