@@ -18,7 +18,7 @@ public class InstructionUnit {
 //    private int immediate;           // Immediate value or memory offset
 //    private InstructionType type;    // Type of instruction
 
-    
+
     // Execution status
     private int issueTime;           // Cycle when instruction was issued //DON'T NEED ITT
     private int startTime;           // Cycle when execution started
@@ -37,7 +37,7 @@ public class InstructionUnit {
         this.source2 = source2;
 //        this.immediate = immediate;
 //        this.type = determineType(operation);
-        
+
         // Initialize execution status
 //        this.issueTime = -1; DON'T NEED IT
         this.startTime = -1;
@@ -144,8 +144,8 @@ public class InstructionUnit {
         public final int writeTime;
         public final String status;
 
-        public InstructionMetrics(int issueTime, int startTime, 
-                                int completeTime, int writeTime, 
+        public InstructionMetrics(int issueTime, int startTime,
+                                int completeTime, int writeTime,
                                 String status) {
             this.issueTime = issueTime;
             this.startTime = startTime;
@@ -159,11 +159,11 @@ public class InstructionUnit {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(operation).append(" ");
-        
+
         if (type != InstructionType.BRANCH) {
             sb.append(destination);
         }
-        
+
         if (type == InstructionType.LOAD || type == InstructionType.STORE) {
             sb.append(", ").append(immediate).append("(").append(source1).append(")");
         } else if (type == InstructionType.BRANCH) {
@@ -176,7 +176,7 @@ public class InstructionUnit {
                 sb.append(", ").append(immediate);
             }
         }
-        
+
         return sb.toString();
     }
 }
