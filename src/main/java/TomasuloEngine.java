@@ -33,17 +33,17 @@ public class TomasuloEngine {
 
     }
 
-    static ReservationStation rs = new ReservationStation("ADD", ReservationStation.Type.ADD,5);
+//    static ReservationStation rs = new ReservationStation("ADD", ReservationStation.Type.ADD,5);
     static Bus bus = new Bus();
 
     public static void busBroadcast(BusData busData){
-        rs.BusDataInput(bus.busDataValue);
+//        rs.BusDataInput(bus.busDataValue);
     }
 
-    public static CompiledInstruction fetchInstruction(){
-        InstructionUnit fetchedInstruction;
-        return new CompiledInstruction(fetchedInstruction);
-    }
+//    public static CompiledInstruction fetchInstruction(){
+//        InstructionUnit fetchedInstruction;
+//        return new CompiledInstruction(fetchedInstruction);
+//    }
 
     public static void Main (String[] args) {
         while(true){

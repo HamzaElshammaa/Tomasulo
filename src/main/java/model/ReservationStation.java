@@ -3,6 +3,8 @@ package model;
 //NEED COMMUNICATION WITH BUS!!!!!!!!!!!
 
 public class ReservationStation {
+
+
     public enum Type{
         ADD,
         MULT,
@@ -11,19 +13,23 @@ public class ReservationStation {
         INT
     }
 
-    private int latency;
-    private String name; //Name of station
-    private Type type; //Type of station ? ex : mult or add 
+    //keep track of the cycles
+    private final int latency;
+    private int cycles;
+
+    //tag name to compare with the bus input tag to erase and to determine the output busData tag
+    private final Tag tag; //Name of station
+    private final Type type; //Type of station ? ex : mult or add
+
+    //the data variables
     private boolean busy; //if station is in use
     private String operation; //operation to preform
     private double vj; //first operand
     private double vk; //second operand
-    //////////////////////////////////////////////////////CHANGED TYPEE///////////////////////////////////////////////////
     private Q qj; //queue first operand
     private Q qk; //queue second operand
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private int address; // For load/store operations
-    private int cycles; //remaining execution cycles
+
+    //other
     private double result; //computed result
     private boolean resultReady; //if execution is done or not
     private BusData busData;
@@ -33,8 +39,8 @@ public class ReservationStation {
     }
 
 
-    public ReservationStation(String name, Type type, int latency) {
-        this.name = name;
+    public ReservationStation(Tag name, Type type, int latency) {
+        this.tag = name;
         this.type = type;
         this.busy = false;
         this.resultReady = false;
@@ -49,8 +55,6 @@ public class ReservationStation {
         this.vk = -1;
         this.qj = null;
         this.qk = null;
-        this.address = -1;
-        this.cycles = -1;
         this.result = -1;
         this.resultReady = false;
         this.busy = false;
