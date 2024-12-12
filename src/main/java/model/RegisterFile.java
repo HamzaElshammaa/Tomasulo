@@ -40,24 +40,24 @@ public class RegisterFile {
     // Get register value if available (not waiting for result)
     public Double getValue(String registerName) {
         Register reg = getRegisterByName(registerName);
-        return (reg.qi == null) ? reg.value : null;
+        return (reg.Qi == null) ? reg.value : null;
     }
 
     // Get reservation station name if register is waiting for result
     public String getQi(String registerName) {
-        return getRegisterByName(registerName).qi;
+        return getRegisterByName(registerName).Qi;
     }
 
     // Set register value and clear reservation station dependency
     public void setValue(String registerName, double value) {
         Register reg = getRegisterByName(registerName);
         reg.value = value;
-        reg.qi = null;
+        reg.Qi = null;
     }
 
     // Set reservation station dependency
     public void setQi(String registerName, String stationName) {
-        getRegisterByName(registerName).qi = stationName;
+        getRegisterByName(registerName).Qi = stationName;
     }
 
     // Helper method to get register by name (e.g., "R1", "F2")
@@ -100,13 +100,13 @@ public class RegisterFile {
         // Add integer registers
         for (int i = 0; i < NUM_INT_REGISTERS; i++) {
             Register reg = integerRegisters[i];
-            states.put("R" + i, new RegisterState(reg.value, reg.qi));
+            states.put("R" + i, new RegisterState(reg.value, reg.Qi));
         }
         
         // Add floating-point registers
         for (int i = 0; i < NUM_FP_REGISTERS; i++) {
             Register reg = fpRegisters[i];
-            states.put("F" + i, new RegisterState(reg.value, reg.qi));
+            states.put("F" + i, new RegisterState(reg.value, reg.Qi));
         }
         
         return states;
