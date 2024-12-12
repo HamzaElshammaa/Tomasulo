@@ -15,7 +15,7 @@ public class InstructionUnit {
     private String destination;       // Destination register
     private String source1;          // First source register
     private String source2;          // Second source register
-    private int immediate;           // Immediate value or memory offset
+//    private int immediate;           // Immediate value or memory offset
 //    private InstructionType type;    // Type of instruction
 
     
@@ -35,8 +35,8 @@ public class InstructionUnit {
         this.destination = destination;
         this.source1 = source1;
         this.source2 = source2;
-        this.immediate = immediate;
-        this.type = determineType(operation);
+//        this.immediate = immediate;
+//        this.type = determineType(operation);
         
         // Initialize execution status
 //        this.issueTime = -1; DON'T NEED IT
@@ -125,8 +125,8 @@ public class InstructionUnit {
     public String getDestination() { return destination; }
     public String getSource1() { return source1; }
     public String getSource2() { return source2; }
-    public int getImmediate() { return immediate; }
-    public InstructionType getType() { return type; }
+//    public int getImmediate() { return immediate; }
+//    public InstructionType getType() { return type; }
     public String getAssignedStation() { return assignedStation; }
     public boolean isExecuting() { return isExecuting; }
     public boolean isComplete() { return isComplete; }
