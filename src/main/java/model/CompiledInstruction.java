@@ -11,6 +11,7 @@ public class CompiledInstruction {
     }
 
     InstructionType instructionOperation;
+    Operation operation; //needed for rs communication
     Tag destination;
     Tag source1;
     Tag source2;
