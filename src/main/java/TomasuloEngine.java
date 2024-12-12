@@ -1,19 +1,47 @@
+import model.InstructionQueue;
+import model.RegisterFile;
+import model.ReservationStation;
+
+//ANYTHING THAT GOES ON THE BUS NEEDS TO COMMUNICATE WITH THE PERSON DOING THE BUS
+
 public class TomasuloEngine {
     //memory variables
-    int blockSize;
-    int cacheSize;
-    int missPenalty;
+    static int blockSize;
+    static int cacheSize;
+    static int missPenalty;
 
     //latencies
-    int additionUnitLatency; //for FP ADD & SUB
-    int multiplicationUnitLatency; //for FP MUL & DIV
+    static int additionUnitLatency; //for FP ADD & SUB
+    static int multiplicationUnitLatency; //for FP MUL & DIV
 
     //RS sizes
-    int additionUnitSize;
-    int multiplicationUnitSize;
+    static int additionUnitSize;
+    static int multiplicationUnitSize;
 
     //other
-    int clockCycle = 0;
+    static int clockCycle = 0;
+    static String instructionsFilePath;
+    static String registerContentsFilePath;
+
+    //RS
+    static ReservationStation []  additionUnitStations;
+    static ReservationStation []  multiplicationUnitStations;
+
+    public static void init(){
+        InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
+        //call reg file
+        additionUnitStations = new ReservationStation[additionUnitSize];
+        multiplicationUnitStations = new ReservationStation[multiplicationUnitSize];
+
+    }
+
+
+
+
+    public static void Main (String[] args) {
+
+    }
+
 
 
 }
