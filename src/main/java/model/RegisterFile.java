@@ -9,16 +9,7 @@ public class RegisterFile {
     private static final int NUM_INT_REGISTERS = 32;
     private static final int NUM_FP_REGISTERS = 32;
     
-    private class Register {
-        private double value;
-        private String Qi;  // Name of reservation station producing result, null if value is ready
 
-        public Register() {
-            this.value = 0.0;
-            this.Qi = null;
-        }
-
-    }
 
     private Register[] integerRegisters;
     private Register[] fpRegisters;

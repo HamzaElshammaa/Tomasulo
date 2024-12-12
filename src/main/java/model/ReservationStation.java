@@ -26,6 +26,11 @@ public class ReservationStation {
     private int cycles; //remaining execution cycles
     private double result; //computed result
     private boolean resultReady; //if execution is done or not
+    private BusData busData;
+
+    public void BusDataInput(BusData busData){
+        this.busData = busData;
+    }
 
 
     public ReservationStation(String name, Type type, int latency) {

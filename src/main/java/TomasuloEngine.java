@@ -1,6 +1,4 @@
-import model.InstructionQueue;
-import model.RegisterFile;
-import model.ReservationStation;
+import model.*;
 
 //ANYTHING THAT GOES ON THE BUS NEEDS TO COMMUNICATE WITH THE PERSON DOING THE BUS
 
@@ -35,11 +33,22 @@ public class TomasuloEngine {
 
     }
 
+    static ReservationStation rs = new ReservationStation("ADD", ReservationStation.Type.ADD,5);
+    static Bus bus = new Bus();
 
+    public static void busBroadcast(BusData busData){
+        rs.BusDataInput(bus.busDataValue);
+    }
 
+    public static CompiledInstruction fetchInstruction(){
+        InstructionUnit fetchedInstruction;
+        return new CompiledInstruction(fetchedInstruction);
+    }
 
     public static void Main (String[] args) {
-
+        while(true){
+            clockCycle++;
+        }
     }
 
 

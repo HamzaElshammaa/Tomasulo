@@ -9,12 +9,15 @@ public class InstructionUnit {
         BRANCH      // BEQ, BNE
     }
 
+    //{String "ADD", String "F6", String "F8", String "F8"}
+
     private String operation;         // Operation name (e.g., "ADD.D", "L.D")
     private String destination;       // Destination register
     private String source1;          // First source register
     private String source2;          // Second source register
     private int immediate;           // Immediate value or memory offset
-    private InstructionType type;    // Type of instruction
+//    private InstructionType type;    // Type of instruction
+
     
     // Execution status
     private int issueTime;           // Cycle when instruction was issued //DON'T NEED ITT

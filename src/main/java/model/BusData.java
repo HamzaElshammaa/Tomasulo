@@ -1,6 +1,7 @@
 package model;
 
 public class BusData {
-    public Source source;
+    public Tag tag;
     public Q dataValue;
+
 }
