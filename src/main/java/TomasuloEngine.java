@@ -99,6 +99,7 @@ public class TomasuloEngine {
             }catch(Exception e){
                 System.out.println("No more instructions to be fetched");
             }
+
             additionUnitStations.runCycle();
             multiplicationUnitStations.runCycle();
 
@@ -107,10 +108,11 @@ public class TomasuloEngine {
             System.out.println("MULT RS \n" + multiplicationUnitStations);
 
             bus.writeBackNext();
+            System.out.println("bus current: " + bus);
+            System.out.println(fp_registerFile);
+
             fp_registerFile.updateRegisterFile();
             int_registerFile.updateRegisterFile();
-
-            System.out.println(fp_registerFile);
 
             System.out.println("------------------------------------------------------------------------------------------- \n");
 

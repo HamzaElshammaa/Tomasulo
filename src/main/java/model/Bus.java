@@ -45,11 +45,11 @@ public class Bus {
     }
 
     // Remove and return the next writeback item
-    public BusData writeBackNext() {
+    public void writeBackNext() {
         if (!writeBackQueue.isEmpty()) {
-            return writeBackQueue.removeFirst().busData; // Remove and return the first item
+            busData =  writeBackQueue.removeFirst().busData; // Remove and return the first item
         }
-        return null; // Return null if the queue is empty
+//        return null; // Return init form
     }
 
 
@@ -67,5 +67,25 @@ public class Bus {
     // Debugging: Print the contents of the writeback queue
     public void printBusState() {
         System.out.println("Writeback Queue: " + writeBackQueue);
+    }
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Bus State:\n");
+
+        // Format current bus data
+        sb.append("Current Bus Data: ")
+                .append(formatBusData(busData))
+                .append("\n");
+
+        return sb.toString();
+    }
+
+    // Helper method to format BusData as "SourceIndex -> TypeValue"
+    private String formatBusData(BusData busData) {
+        if (busData == null || busData.tag == null || busData.dataValue == null) {
+            return "No data";
+        }
+        String tagRepresentation = busData.tag.source.name() + busData.tag.index;
+        String dataRepresentation = busData.dataValue.type.name() + busData.dataValue.value;
+        return tagRepresentation + " -> " + dataRepresentation;
     }
 }

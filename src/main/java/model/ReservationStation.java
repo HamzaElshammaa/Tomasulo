@@ -168,12 +168,12 @@ public class ReservationStation {
 
 
     public void executeCycle(){
-        if(!isReadyToExecute() || cycles <= 0){
+        if(!isReadyToExecute() || cycles <= -1){
             return;
         }
         cycles--;
         // if last cycle compute the result
-        if(cycles == 0){
+        if(cycles == -1){
             computeResult();
         }
     }
