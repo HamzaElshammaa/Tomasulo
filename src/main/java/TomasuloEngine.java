@@ -97,9 +97,6 @@ public class TomasuloEngine {
 
 
 
-
-
-
             clock.increment();
         }
     }
