@@ -137,6 +137,7 @@ public class ReservationStationManager {
     }
 
     public void runCycle() {
+        attemptToIssueInstructions();
         for (ReservationStation rs : reservationStations) {
             rs.runCycle();
         }
