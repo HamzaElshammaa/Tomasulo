@@ -16,7 +16,7 @@ public class Operation {
 
     public OperationType operationType;
 
-    public Operation(OperationType operationType) {
+    public Operation(CompiledInstruction.InstructionType operationType) {
         this.operationType = operationType;
     }
 

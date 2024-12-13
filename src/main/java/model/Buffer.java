@@ -1,229 +1,145 @@
 package model;
-//Latest Cache-Buffer-DataMemory
+
 public class Buffer {
     public enum BufferType {
         LOAD,
         STORE
     }
 
-    private final String name;          // Buffer identifier (e.g., "Load1", "Store1")
-    private final BufferType type;      // Type of buffer
-    private boolean busy;               // Whether buffer is in use
-    private Integer address;            // Effective address
-    private Double value;               // Value to be stored (for store buffer)
-    private String valueSource;         // RS that will provide the value (for store buffer)
-    private Integer calculatedAddress;  // Final calculated address
-    private boolean addressReady;       // Whether address calculation is complete
-    private int remainingCycles;        // Cycles left for memory operation
-    private boolean executed;           // Whether memory operation is complete
+    private final Tag tag; // Use Tag as the name/identifier of the buffer
+    private final BufferType type;
+    private boolean busy;
+    private Double value;
+    private Tag valueSourceTag;
+    private boolean addressReady;
+    private int cycles;
+    private boolean executed;
+    private final Bus bus;
+    private final int latency;
+    private int enterTime = -1;
+    private boolean addedToWriteBackQueue = false;
 
-    public Buffer(String name, BufferType type) {
-        this.name = name;
+    public Buffer(Tag tag, BufferType type, int latency, Bus bus) {
+        this.tag = tag;
         this.type = type;
+        this.latency = latency;
+        this.bus = bus;
         clear();
     }
 
+    public boolean isBusy() {
+        return busy;
+    }
     public void clear() {
         this.busy = false;
-        this.address = null;
         this.value = null;
-        this.valueSource = null;
-        this.calculatedAddress = null;
+        this.valueSourceTag = null;
         this.addressReady = false;
-        this.remainingCycles = 0;
+        this.cycles = 0;
         this.executed = false;
+        this.addedToWriteBackQueue = false;
     }
 
-    // Issue a new memory operation to this buffer
-    public void issue(Integer address, int latency) {
+    // Issue a new memory operation using a CompiledInstruction
+    public void issue(CompiledInstruction instruction, int enterTime) {
         this.busy = true;
-        this.address = address;
-        this.remainingCycles = latency;
+        this.cycles = latency;
+        this.enterTime = enterTime;
         this.executed = false;
+
+        if (type == BufferType.STORE) {
+            // For store operations, set the value source from the instruction's source2 tag
+            this.valueSourceTag = instruction.source2;
+        }
     }
 
-    // For store buffer: set the value or its source
-    public void setStoreValue(Double value, String source) {
+    public void setStoreValue(Double value, Tag sourceTag) {
         if (type != BufferType.STORE) {
             throw new IllegalStateException("Cannot set store value for load buffer");
         }
         this.value = value;
-        this.valueSource = source;
+        this.valueSourceTag = sourceTag;
     }
 
-    // Update value when result is broadcast (for store buffer)
-    public void updateValue(String source, double value) {
-        if (valueSource != null && valueSource.equals(source)) {
+    public void updateValue(Tag sourceTag, double value) {
+        if (valueSourceTag != null && valueSourceTag.equals(sourceTag)) {
             this.value = value;
-            this.valueSource = null;
+            this.valueSourceTag = null;
         }
     }
 
-    // Check if ready to execute memory operation
     public boolean isReadyToExecute() {
-        if (!busy || remainingCycles <= 0 || executed) {
+        if (!busy || cycles <= 0 || executed) {
             return false;
         }
 
         if (type == BufferType.LOAD) {
             return addressReady;
         } else {
-            return addressReady && value != null && valueSource == null;
+            return addressReady && value != null && valueSourceTag == null;
         }
     }
 
-    // Execute one cycle of the memory operation
     public boolean executeCycle() {
         if (!isReadyToExecute()) {
             return false;
         }
 
-        remainingCycles--;
-        if (remainingCycles == 0) {
+        cycles--;
+        if (cycles == 0) {
             executed = true;
+            broadcastResult();
             return true;
         }
         return false;
     }
 
-    // Getters
-    public String getName() { return name; }
-    public BufferType getType() { return type; }
-    public boolean isBusy() { return busy; }
-    public Integer getAddress() { return address; }
-    public Double getValue() { return value; }
-    public String getValueSource() { return valueSource; }
-    public Integer getCalculatedAddress() { return calculatedAddress; }
-    public boolean isAddressReady() { return addressReady; }
-    public int getRemainingCycles() { return remainingCycles; }
-    public boolean isExecuted() { return executed; }
-
-    // Setters
-    public void setAddressReady(boolean ready) {
-        this.addressReady = ready;
-    }
-    public void setCalculatedAddress(Integer address) {
-        this.calculatedAddress = address;
-        this.addressReady = true;
-    }
-
-    // Get buffer state for display
-    public BufferState getState() {
-        return new BufferState(
-                name,
-                type,
-                busy,
-                address,
-                value,
-                valueSource,
-                calculatedAddress,
-                addressReady,
-                remainingCycles,
-                executed
-        );
-    }
-
-    // State class for GUI display
-    public static class BufferState {
-        public final String name;
-        public final BufferType type;
-        public final boolean busy;
-        public final Integer address;
-        public final Double value;
-        public final String valueSource;
-        public final Integer calculatedAddress;
-        public final boolean addressReady;
-        public final int remainingCycles;
-        public final boolean executed;
-
-        public BufferState(String name, BufferType type, boolean busy,
-                           Integer address, Double value, String valueSource,
-                           Integer calculatedAddress, boolean addressReady,
-                           int remainingCycles, boolean executed) {
-            this.name = name;
-            this.type = type;
-            this.busy = busy;
-            this.address = address;
-            this.value = value;
-            this.valueSource = valueSource;
-            this.calculatedAddress = calculatedAddress;
-            this.addressReady = addressReady;
-            this.remainingCycles = remainingCycles;
-            this.executed = executed;
+    private void broadcastResult() {
+        if (type == BufferType.LOAD || type == BufferType.STORE) {
+            bus.addToWritebackQueue(new BusData(tag, new Q(Q.DataType.R, value)), enterTime);
         }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name).append(": ");
-        if (!busy) {
-            sb.append("Not busy");
-        } else {
-            sb.append("Busy, ");
-            if (type == BufferType.LOAD) {
-                sb.append("Loading from ");
-            } else {
-                sb.append("Storing ");
-                if (value != null) {
-                    sb.append(value);
-                } else {
-                    sb.append("(waiting for ").append(valueSource).append(")");
-                }
-                sb.append(" to ");
-            }
-            sb.append("address ");
-            if (calculatedAddress != null) {
-                sb.append(calculatedAddress);
-            } else {
-                sb.append("(calculating)");
-            }
-            if (executed) {
-                sb.append(" [Completed]");
-            } else {
-                sb.append(" [").append(remainingCycles).append(" cycles remaining]");
-            }
+    public void runCycle() {
+        if (executed && !addedToWriteBackQueue) {
+            broadcastResult();
+            addedToWriteBackQueue = true;
+        } else if (busy) {
+            executeCycle();
         }
-        return sb.toString();
     }
 
-    // Helper method to print the state of a buffer
-    private static void printBufferState(Buffer buffer) {
-        Buffer.BufferState state = buffer.getState();
-        System.out.println("Buffer: " + state.name);
-        System.out.println("  Type: " + state.type);
-        System.out.println("  Busy: " + state.busy);
-        System.out.println("  Address: " + state.address);
-        System.out.println("  Value: " + state.value);
-        System.out.println("  Value Source: " + state.valueSource);
-        System.out.println("  Calculated Address: " + state.calculatedAddress);
-        System.out.println("  Address Ready: " + state.addressReady);
-        System.out.println("  Remaining Cycles: " + state.remainingCycles);
-        System.out.println("  Executed: " + state.executed);
-        System.out.println();
-    }
+    // Getters and setters...
 
+    // Main method for testing
     public static void main(String[] args) {
-        // Create load and store buffers
-        Buffer loadBuffer = new Buffer("Load1", Buffer.BufferType.LOAD);
-        Buffer storeBuffer = new Buffer("Store1", Buffer.BufferType.STORE);
+        // Create a bus
+        Bus bus = new Bus();
 
-        // Issue a load operation
+        // Create load and store buffers with tags as names
+        Buffer loadBuffer = new Buffer(new Tag(Tag.Source.L, 0), Buffer.BufferType.LOAD, 3, bus);
+        Buffer storeBuffer = new Buffer(new Tag(Tag.Source.S, 1), Buffer.BufferType.STORE, 3, bus);
+
+        // Create compiled instructions
+        CompiledInstruction loadInstruction = new CompiledInstruction(
+            new Operation(CompiledInstruction.InstructionType.LOAD), new Tag(Tag.Source.L, 100), null, null);
+        CompiledInstruction storeInstruction = new CompiledInstruction(
+            new Operation(CompiledInstruction.InstructionType.STORE), new Tag(Tag.Source.S, 200), new Tag(Tag.Source.REG, 1), null);
+
+        // Issue operations using compiled instructions
         System.out.println("Issuing load operation to Load1...");
-        loadBuffer.issue(100, 3); // Load from address 100, 3 cycles latency
-        loadBuffer.setCalculatedAddress(100); // Address is ready
+        loadBuffer.issue(loadInstruction, 0);
+        loadBuffer.addressReady = true;
         printBufferState(loadBuffer);
 
-        // Issue a store operation
         System.out.println("Issuing store operation to Store1...");
-        storeBuffer.issue(200, 3); // Store to address 200, 3 cycles latency
-        storeBuffer.setStoreValue(null, "Add1"); // Waiting for value from Add1
-        storeBuffer.setCalculatedAddress(200); // Address is ready
+        storeBuffer.issue(storeInstruction, 0);
+        storeBuffer.addressReady = true;
         printBufferState(storeBuffer);
 
-        // Simulate Add1 completing and broadcasting its result
-        System.out.println("Broadcasting result from Add1...");
-        storeBuffer.updateValue("Add1", 3.14);
+        // Simulate value update
+        System.out.println("Broadcasting result from REG1...");
+        storeBuffer.updateValue(new Tag(Tag.Source.REG, 1), 3.14);
         printBufferState(storeBuffer);
 
         // Execute cycles for load buffer
@@ -247,4 +163,16 @@ public class Buffer {
         }
     }
 
+    // Helper method to print the state of a buffer
+    private static void printBufferState(Buffer buffer) {
+        System.out.println("Buffer: " + buffer.tag);
+        System.out.println("  Type: " + buffer.type);
+        System.out.println("  Busy: " + buffer.busy);
+        System.out.println("  Value: " + buffer.value);
+        System.out.println("  Value Source Tag: " + buffer.valueSourceTag);
+        System.out.println("  Address Ready: " + buffer.addressReady);
+        System.out.println("  Remaining Cycles: " + buffer.cycles);
+        System.out.println("  Executed: " + buffer.executed);
+        System.out.println();
+    }
 }

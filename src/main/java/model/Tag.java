@@ -7,7 +7,9 @@ public class Tag {
         M, // Need to check if Register is waiting for another operation (in reservation station)
         REG, //Register
         FP_REG, //floating point REG
-        IMM
+        IMM,
+        L,
+        S
     }
 
     public Source source;
