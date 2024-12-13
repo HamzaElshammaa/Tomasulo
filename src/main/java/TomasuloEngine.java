@@ -37,7 +37,7 @@ public class TomasuloEngine {
 
 
     public static void init(){
-        InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
+//        InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
 
 
     }

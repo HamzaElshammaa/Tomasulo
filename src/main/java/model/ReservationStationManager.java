@@ -3,8 +3,9 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import static model.Tag.source.A;
-import static model.Tag.source.M;
+import static model.Tag.Source.M;
+import static model.Tag.Source.A;
+
 
 public class ReservationStationManager {
     public static class IssueData {
@@ -38,10 +39,8 @@ public class ReservationStationManager {
         // Initialize the reservation stations array
         for (int i = 0; i < numberOfStations; i++) {
             // Generate a unique tag for each station (e.g., ADD_0, MULT_1, etc.)
-            Tag tag = new Tag();
-            tag.source = (type == ReservationStation.Type.ADD) ? A : M;
-            tag.index = i;
-
+            Tag.Source src = (type == ReservationStation.Type.ADD) ? A : M;
+            Tag tag = new Tag(src, i);
             // Create a new reservation station and add it to the array
             reservationStations[i] = new ReservationStation(tag, type, latency,fpRegisterFile, intRegisterFile, bus);
         }
