@@ -16,4 +16,8 @@ public class Q {
         this.value = value;
     }
 
+    public String toString() {
+        return type + " " + value;
+    }
+
 }

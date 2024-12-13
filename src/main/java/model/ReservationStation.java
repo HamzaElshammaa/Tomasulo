@@ -177,29 +177,29 @@ public class ReservationStation {
             computeResult();
         }
     }
-    
+
     private void computeResult(){
 
-            switch (operation.operationType) {
-                case ADD:
-                case FP_ADD:
-                    result = vj + vk;
-                    break;
-                case SUB:
-                case FP_SUB:
-                    result = vj - vk;
-                    break;
-                case MULT:
-                case FP_MULT:
-                    result = vj * vk;
-                    break;
-                case DIV:
-                case FP_DIV:
-                    result = vj / vk;
-                    break;
-                default:
-                    throw new IllegalStateException("Unkown operation:" + operation);
-            }
+        switch (operation.operationType) {
+            case ADD:
+            case FP_ADD:
+                result = vj + vk;
+                break;
+            case SUB:
+            case FP_SUB:
+                result = vj - vk;
+                break;
+            case MULT:
+            case FP_MULT:
+                result = vj * vk;
+                break;
+            case DIV:
+            case FP_DIV:
+                result = vj / vk;
+                break;
+            default:
+                throw new IllegalStateException("Unkown operation:" + operation);
+        }
 
         resultReady = true;
     }
@@ -251,6 +251,7 @@ public class ReservationStation {
         }
         else{
             if (busy){
+                updateOperands();
                 executeCycle();
             }
         }

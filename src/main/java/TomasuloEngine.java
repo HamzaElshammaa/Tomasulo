@@ -1,5 +1,5 @@
 import model.*;
-
+import model.Bus;
 import java.sql.SQLOutput;
 import java.util.List;
 
@@ -12,15 +12,15 @@ public class TomasuloEngine {
     static int missPenalty = 10;
     static int memorySize = 1000;
 
-    //registerFiles
-    public static RegisterFile fp_registerFile = new RegisterFile(new double[] {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0});
-    public static RegisterFile int_registerFile = new RegisterFile(new double[] {0, 0, 0, 2, 0, 0, 0});
 
     //clock
     static Clock clock = new Clock(0);
 
     //Bus
     public static Bus bus = new Bus();
+    //registerFiles
+    public static RegisterFile fp_registerFile = new RegisterFile(new double[] {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0},bus);
+    public static RegisterFile int_registerFile = new RegisterFile(new double[] {0, 0, 0, 2, 0, 0, 0},bus);
 
     //cache
     static Cache cache = new Cache(cacheSize,blockSize,1,missPenalty);
@@ -54,7 +54,7 @@ public class TomasuloEngine {
 
     public static void init(){
 //        String filePath = "D:\\Uni\\Semester 7\\Microprocessors\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
-        String filePath = "C:\\Sem 7\\Microprocessors\\simulationProject\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
+        String filePath = "C:\\Users\\mozam\\OneDrive\\Uni\\Semester 7\\CSEN702 Microprocessors\\Micro Project 2\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         // Load raw instructions from the file
         List<String> rawInstructions = InstructionQueue.loadRawInstructions(filePath);
 
@@ -84,7 +84,7 @@ public class TomasuloEngine {
         int i = 0;
         while(i < 21){
             i++;
-            
+
             System.out.println("\n" + "Clock Cycle: " + clock.getCycle());
 
             if(clock.getCycle() == 0){

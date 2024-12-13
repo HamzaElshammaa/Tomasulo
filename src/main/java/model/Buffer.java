@@ -336,4 +336,21 @@ public class Buffer {
             executeCycle();
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nBuffer: ").append(tag).append("\n");
+        sb.append("Type: ").append(type).append("\n");
+        sb.append("Busy: ").append(busy).append("\n");
+        sb.append("Value: ").append(value != null ? value : "None").append("\n");
+        sb.append("Value Source Tag: ").append(valueSourceTag != null ? valueSourceTag : "None").append("\n");
+        sb.append("Address Tag: ").append(addressTag != null ? addressTag : "None").append("\n");
+        sb.append("Address Ready: ").append(addressReady).append("\n");
+        sb.append("Cycles Remaining: ").append(cycles > 0 ? cycles : "Execution Complete").append("\n");
+        sb.append("Executed: ").append(executed).append("\n");
+        sb.append("Added to WriteBack Queue: ").append(addedToWriteBackQueue).append("\n");
+        return sb.toString();
+    }
+
 }

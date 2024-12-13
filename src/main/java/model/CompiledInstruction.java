@@ -26,4 +26,9 @@ public class CompiledInstruction {
     public String toString() {
         return operation + " " + destination + " " + source1 + " " + source2 + "\n";
     }
+
+
+    public Operation getOperation() {
+        return operation;
+    }
 }
