@@ -11,7 +11,11 @@ public class Bus {
     // List of items waiting to write back
     private List<String> writebackQueue;
 
-    public BusData busDataValue;
+    private BusData busDataValue;
+
+    public BusData getBusDataValue() {
+        return busDataValue;
+    }
 
     // Constructor
     public Bus() {

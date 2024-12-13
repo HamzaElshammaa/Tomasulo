@@ -7,6 +7,11 @@ public class Operation {
         MULT,
         DIV,
         LOAD,
-        STORE
+        STORE,
+        FP_ADD,
+        FP_SUB,
+        FP_MULT,
+        FP_DIV,
     }
+    public OperationType operationType;
 }

@@ -2,30 +2,72 @@ package model;
 
 //NEED COMMUNICATION WITH BUS!!!!!!!!!!!
 
+import static model.Operation.OperationType;
+import static model.Operation.OperationType.ADD;
+import static model.Tag.source.A;
+import static model.Tag.source.M;
+
 public class ReservationStation {
-
-
     public enum Type{
         ADD,
         MULT,
-        LOAD,
-        STORE,
-        INT
     }
 
     //keep track of the cycles
     private final int latency;
+
+    public void setVj(double vj) {
+        this.vj = vj;
+    }
+
+    public void setVk(double vk) {
+        this.vk = vk;
+    }
+
+    public void setQj(Q qj) {
+        this.qj = qj;
+    }
+
+    public void setQk(Q qk) {
+        this.qk = qk;
+    }
+
+    public void setBusy(boolean busy) {
+        this.busy = busy;
+    }
+
     private int cycles;
 
     //tag name to compare with the bus input tag to erase and to determine the output busData tag
     private final Tag tag; //Name of station
     private final Type type; //Type of station ? ex : mult or add
 
+    public boolean isBusy() {
+        return busy;
+    }
+
     //the data variables
     private boolean busy; //if station is in use
-    private String operation; //operation to preform
+    private Operation operation; //operation to preform
     private double vj; //first operand
     private double vk; //second operand
+
+    public double getVj() {
+        return vj;
+    }
+
+    public double getVk() {
+        return vk;
+    }
+
+    public Q getQj() {
+        return qj;
+    }
+
+    public Q getQk() {
+        return qk;
+    }
+
     private Q qj; //queue first operand
     private Q qk; //queue second operand
 
@@ -48,7 +90,11 @@ public class ReservationStation {
 
         clear();
     }
-    
+
+    public boolean isReadyToExecute() {
+        return (this.qj.type == Q.DataType.R && this.qk.type == Q.DataType.R);
+    }
+
     void clear(){
         this.operation = null;
         this.vj = -1;
@@ -61,29 +107,14 @@ public class ReservationStation {
 
     }
 
-    public void issue(String operation){ //given already in constructor
+    public void issue(Operation operation){ //given already in constructor
         this.busy = true;
         this.operation = operation;
         this.cycles = latency;
-        this.resultReady = false;
         this.result = -1;
     }
 
 
-    public boolean isReadyToExecute() {
-        if(!busy || cycles <= 0){
-            return false;
-        }
-        switch (type) {
-            case LOAD:
-                return address != -1;
-            case STORE:
-            return address != -1 && vj != -1 && qj == null;
-        
-            default:
-                return vj != -1 && vk!= -1 && qj == null && qk == null;
-        }
-    }
 
     public void executeCycle(){
         if(!isReadyToExecute() || cycles <= 0){
@@ -97,91 +128,69 @@ public class ReservationStation {
     }
     
     private void computeResult(){
-        if(type == Type.LOAD || type == Type.STORE){
-            result = vj; // for load / stores value is already in vj
-        }else{
-            switch (operation) {
-                case "ADD.D":
-                case "ADDI":
+
+            switch (operation.operationType) {
+                case ADD:
+                case FP_ADD:
                     result = vj + vk;
                     break;
-            case "SUB.D":
-            case "SUBI":
-                result = vj - vk;
-                break;
-            case "MUL.D" :
-                result = vj * vk;
-                break;
-            case "DIV.D":
-                result= vj/vk;
-                break;
-            
-             default:
+                case SUB:
+                case FP_SUB:
+                    result = vj - vk;
+                    break;
+                case MULT:
+                case FP_MULT:
+                    result = vj * vk;
+                    break;
+                case DIV:
+                case FP_DIV:
+                    result = vj / vk;
+                    break;
+                default:
                     throw new IllegalStateException("Unkown operation:" + operation);
             }
-        }
+
         resultReady = true;
     }
 
-    public void updateOperand(String rsName, double value){
-//        if(rsName.equals(qj)){
-//            vj = value;
-//            qj = null;
-//        }
-//        if(rsName.equals(qk)){
-//            vk = value;
-//            qk = null;
-//        }
+    public static boolean QAndTagCompare(Q q, Tag tag) {
+        // Check if the types match based on their respective mappings
+        boolean typeMatches = false;
+
+        switch (q.type) {
+            case A:
+                typeMatches = tag.source == A;
+                break;
+            case M:
+                typeMatches = tag.source == M;
+                break;
+        }
+
+        // Check if the values match
+        boolean valueMatches = q.value == tag.index;
+
+        // Return true if both type and value match
+        return typeMatches && valueMatches;
     }
-    // Getters and setters
-    public String getName() { return name; }
-    public Type getType() { return type; }
-    public boolean isBusy() { return busy; }
-    public String getOperation() { return operation; }
-    public Double getVj() { return vj; }
-    public Double getVk() { return vk; }
-    public Q getQj() { return qj; }
-    public Q getQk() { return qk; }
-    public Integer getAddress() { return address; }
-    public Integer getCycles() { return cycles; }
-    public Double getResult() { return result; }
-    public boolean isResultReady() { return resultReady; }
 
-    public void setVj(Double vj) { this.vj = vj; }
-    public void setVk(Double vk) { this.vk = vk; }
-    public void setQj(Q qj) { this.qj = qj; }
-    public void setQk(Q qk) { this.qk = qk; }
-    public void setAddress(Integer address) { this.address = address; }
-
-   // State class for GUI display
-   public static class ReservationStationState {
-    public final String name;
-    public final Type type;
-    public final boolean busy;
-    public final String operation;
-    public final Double vj;
-    public final Double vk;
-    public final String qj;
-    public final String qk;
-    public final Integer address;
-    public final Integer cycles;
-    public final boolean resultReady;
-
-    public ReservationStationState(String name, Type type, boolean busy, 
-                                 String operation, Double vj, Double vk, 
-                                 String qj, String qk, Integer address, 
-                                 Integer cycles, boolean resultReady) {
-        this.name = name;
-        this.type = type;
-        this.busy = busy;
-        this.operation = operation;
-        this.vj = vj;
-        this.vk = vk;
-        this.qj = qj;
-        this.qk = qk;
-        this.address = address;
-        this.cycles = cycles;
-        this.resultReady = resultReady;
+    public void updateOperands(){
+        if(QAndTagCompare(qj, tag)){
+            vj = busData.dataValue.value;
+            qj.type = Q.DataType.R;
+            qj.value = 0;
+        }
+        if(QAndTagCompare(qj, tag)){
+            vk = busData.dataValue.value;
+            qk.type = Q.DataType.R;
+            qk.value = 0;
+        }
     }
-}
+
+    public void clearCurrentStation(){
+        if (busData.tag == this.tag){
+            clear();
+        }
+    }
+
+
 } 
