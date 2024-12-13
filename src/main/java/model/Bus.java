@@ -33,6 +33,7 @@ public class Bus {
 
     // Constructor
     public Bus() {
+        this.busData = new BusData(new Tag(Tag.Source.A, 0), new Q(Q.DataType.R, 0));
         this.writeBackQueue = new ArrayList<>();
     }
 

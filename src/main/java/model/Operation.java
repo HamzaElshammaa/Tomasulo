@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Operation {
     public enum OperationType {
         ADD,
@@ -16,12 +18,16 @@ public class Operation {
 
     public OperationType operationType;
 
-    public Operation(CompiledInstruction.InstructionType operationType) {
+    public Operation(OperationType operationType) {
         this.operationType = operationType;
     }
 
     public OperationType getOperationType() {
         return operationType;
+    }
+
+    public boolean isOperationEqual(OperationType operation) {
+        return operationType == operation;
     }
 
     public String toString() {

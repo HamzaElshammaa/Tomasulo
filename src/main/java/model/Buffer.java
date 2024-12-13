@@ -139,9 +139,9 @@ public class Buffer {
 
         // Create compiled instructions
         CompiledInstruction loadInstruction = new CompiledInstruction(
-            new Operation(CompiledInstruction.InstructionType.LOAD), new Tag(Tag.Source.L, 100), null, null);
+            new Operation(Operation.OperationType.LOAD), new Tag(Tag.Source.L, 100), null, null);
         CompiledInstruction storeInstruction = new CompiledInstruction(
-            new Operation(CompiledInstruction.InstructionType.STORE), new Tag(Tag.Source.S, 200), new Tag(Tag.Source.REG, 1), null);
+            new Operation(Operation.OperationType.STORE), new Tag(Tag.Source.S, 200), new Tag(Tag.Source.REG, 1), null);
 
         // Issue operations using compiled instructions
         System.out.println("Issuing load operation to Load1...");
