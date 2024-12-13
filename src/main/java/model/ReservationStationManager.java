@@ -10,11 +10,15 @@ public class ReservationStationManager {
     private final ReservationStation.Type type; // Type of the reservation stations (ADD or MULT)
     private final ReservationStation[] reservationStations; // Array of reservation stations
     private final List<CompiledInstruction> waitingInstructions; // List of instructions waiting for RS
+    private final RegisterFile fp_registerFile;
+    private final RegisterFile int_registerFile;
 
     // Constructor
-    public ReservationStationManager(ReservationStation.Type type, int numberOfStations, int latency) {
+    public ReservationStationManager(ReservationStation.Type type, int numberOfStations, int latency, RegisterFile fpRegisterFile, RegisterFile intRegisterFile) {
         this.type = type;
         this.reservationStations = new ReservationStation[numberOfStations];
+        fp_registerFile = fpRegisterFile;
+        int_registerFile = intRegisterFile;
         this.waitingInstructions = new ArrayList<>();
 
         // Initialize the reservation stations array

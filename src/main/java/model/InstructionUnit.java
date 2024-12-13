@@ -36,7 +36,7 @@ public class InstructionUnit {
         this.source1 = source1;
         this.source2 = source2;
         this.immediate = immediate;
-        this.type = determineType(operation);
+//        this.type = determineType(operation);
         
         // Initialize execution status
 //        this.issueTime = -1; DON'T NEED IT
@@ -126,7 +126,7 @@ public class InstructionUnit {
     public String getSource1() { return source1; }
     public String getSource2() { return source2; }
     public int getImmediate() { return immediate; }
-    public InstructionType getType() { return type; }
+//    public InstructionType getType() { return type; }
     public String getAssignedStation() { return assignedStation; }
     public boolean isExecuting() { return isExecuting; }
     public boolean isComplete() { return isComplete; }
@@ -160,22 +160,22 @@ public class InstructionUnit {
         StringBuilder sb = new StringBuilder();
         sb.append(operation).append(" ");
         
-        if (type != InstructionType.BRANCH) {
-            sb.append(destination);
-        }
-        
-        if (type == InstructionType.LOAD || type == InstructionType.STORE) {
-            sb.append(", ").append(immediate).append("(").append(source1).append(")");
-        } else if (type == InstructionType.BRANCH) {
-            sb.append(source1).append(", ").append(source2).append(", ").append(immediate);
-        } else {
-            sb.append(", ").append(source1);
-            if (source2 != null) {
-                sb.append(", ").append(source2);
-            } else if (type == InstructionType.INT_ADD) {
-                sb.append(", ").append(immediate);
-            }
-        }
+//        if (type != InstructionType.BRANCH) {
+//            sb.append(destination);
+//        }
+//
+//        if (type == InstructionType.LOAD || type == InstructionType.STORE) {
+//            sb.append(", ").append(immediate).append("(").append(source1).append(")");
+//        } else if (type == InstructionType.BRANCH) {
+//            sb.append(source1).append(", ").append(source2).append(", ").append(immediate);
+//        } else {
+//            sb.append(", ").append(source1);
+//            if (source2 != null) {
+//                sb.append(", ").append(source2);
+//            } else if (type == InstructionType.INT_ADD) {
+//                sb.append(", ").append(immediate);
+//            }
+//        }
         
         return sb.toString();
     }

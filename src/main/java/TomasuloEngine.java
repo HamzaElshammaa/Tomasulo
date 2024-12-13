@@ -25,6 +25,10 @@ public class TomasuloEngine {
     static ReservationStation []  additionUnitStations;
     static ReservationStation []  multiplicationUnitStations;
 
+    //registerFiles
+    private RegisterFile fp_registerFile;
+    private RegisterFile int_registerFile;
+
     public static void init(){
         InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
         //call reg file

@@ -9,6 +9,6 @@ public class Q {
     }
 
     public DataType type;
-    public int value;
+    public double value;
 
 }
