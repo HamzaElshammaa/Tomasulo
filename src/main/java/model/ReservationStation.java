@@ -122,6 +122,7 @@ public class ReservationStation {
     }
 
     public void issue(CompiledInstruction instruction, int enterTime){ //given already in constructor
+        System.out.println("ISSUEDDD" + tag + instruction.source2);
         this.busy = true;
         this.operation = instruction.operation;
         this.cycles = latency;

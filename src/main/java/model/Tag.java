@@ -9,7 +9,8 @@ public class Tag {
         FP_REG, //floating point REG
         IMM,
         L,
-        S
+        S,
+        X //nothinggg emptyy
     }
 
     public Source source;

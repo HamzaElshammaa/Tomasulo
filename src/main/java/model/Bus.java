@@ -33,7 +33,7 @@ public class Bus {
 
     // Constructor
     public Bus() {
-        this.busData = new BusData(new Tag(Tag.Source.A, 0), new Q(Q.DataType.R, 0));
+        this.busData = new BusData(new Tag(Tag.Source.X, 0), new Q(Q.DataType.R, 0));
         this.writeBackQueue = new ArrayList<>();
     }
 
@@ -49,7 +49,10 @@ public class Bus {
         if (!writeBackQueue.isEmpty()) {
             busData =  writeBackQueue.removeFirst().busData; // Remove and return the first item
         }
-//        return null; // Return init form
+        else{
+            busData = new BusData(new Tag(Tag.Source.X, 0), new Q(Q.DataType.R, 0));
+        }
+
     }
 
 
