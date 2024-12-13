@@ -99,6 +99,8 @@ public class ReservationStation {
         this.busy = false;
         this.resultReady = false;
         this.latency = latency;
+        this.qj = new Q(Q.DataType.R, 0);
+        this.qk = new Q(Q.DataType.R, 0);
 
         clear();
     }
@@ -253,6 +255,25 @@ public class ReservationStation {
             }
         }
         clearCurrentStation();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nReservation Station: ").append(tag).append("\n");
+        sb.append("Type: ").append(type).append("\n");
+        sb.append("Busy: ").append(busy).append("\n");
+        sb.append("Operation: ").append(operation != null ? operation.operationType : "None").append("\n");
+        sb.append("Vj: ").append(qj != null && qj.type != Q.DataType.R ? "Waiting" : vj).append("\n");
+        sb.append("Vk: ").append(qk != null && qk.type != Q.DataType.R ? "Waiting" : vk).append("\n");
+        sb.append("Qj: ").append(qj != null ? qj : "None").append("\n");
+        sb.append("Qk: ").append(qk != null ? qk : "None").append("\n");
+        sb.append("Result: ").append(resultReady ? result : "Not Ready").append("\n");
+        sb.append("Cycles Remaining: ").append(cycles > 0 ? cycles : "Execution Complete").append("\n");
+        sb.append("Result Ready: ").append(resultReady).append("\n");
+        sb.append("Added to WriteBack Queue: ").append(addedToWriteBackQueue).append("\n");
+        sb.append("Enter Time: ").append(enterTime).append("\n");
+        return sb.toString();
     }
 
 

@@ -142,4 +142,12 @@ public class ReservationStationManager {
             rs.runCycle();
         }
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (ReservationStation rs : reservationStations) {
+            sb.append(rs.toString());
+        }
+        return sb.toString();
+    }
 }
