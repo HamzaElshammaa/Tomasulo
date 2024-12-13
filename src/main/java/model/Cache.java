@@ -1,4 +1,4 @@
-package model;
+/*package model;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +9,7 @@ public class Cache {
     private final int numberOfBlocks;
     private final int hitLatency;     // cycles
     private final int missLatency;    // cycles
+    private boolean firstAccess = true;
 
     private static class CacheBlock {
         boolean valid;
@@ -161,6 +162,85 @@ public class Cache {
             this.validBlocks = validBlocks;
             this.hitLatency = hitLatency;
             this.missLatency = missLatency;
+        }
+    }
+}*/
+
+package model;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Cache {
+    private final int blockSize; // Number of bytes per block
+    private final int cacheSize; // Total number of blocks the cache can hold
+    private final int hitLatency;
+    private final int missLatency;
+    private final Map<Integer, byte[]> cacheData; // Cache stores blocks of bytes
+
+    public Cache(int blockSize, int cacheSize, int hitLatency, int missLatency) {
+        this.blockSize = blockSize;
+        this.cacheSize = cacheSize;
+        this.hitLatency = hitLatency;
+        this.missLatency = missLatency;
+        this.cacheData = new LinkedHashMap<Integer, byte[]>(cacheSize, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Integer, byte[]> eldest) {
+                return size() > cacheSize;
+            }
+        };
+    }
+
+    public CacheAccessResult read(int address) {
+        int blockAddress = address / blockSize;
+        int offset = address % blockSize;
+
+        if (!cacheData.containsKey(blockAddress)) {
+            // Compulsory miss: Load block from memory
+            byte[] block = loadBlockFromMemory(blockAddress);
+            cacheData.put(blockAddress, block);
+            return new CacheAccessResult(false, missLatency, block[offset]);
+        } else {
+            // Cache hit
+            byte[] block = cacheData.get(blockAddress);
+            return new CacheAccessResult(true, hitLatency, block[offset]);
+        }
+    }
+
+    public CacheAccessResult write(int address, byte value) {
+        int blockAddress = address / blockSize;
+        int offset = address % blockSize;
+
+        if (!cacheData.containsKey(blockAddress)) {
+            // Compulsory miss: Load block from memory
+            byte[] block = loadBlockFromMemory(blockAddress);
+            cacheData.put(blockAddress, block);
+        }
+
+        // Cache hit: Write value
+        byte[] block = cacheData.get(blockAddress);
+        block[offset] = value;
+        return new CacheAccessResult(true, hitLatency, value);
+    }
+
+    private byte[] loadBlockFromMemory(int blockAddress) {
+        // Simulate loading a block from memory
+        byte[] block = new byte[blockSize];
+        for (int i = 0; i < blockSize; i++) {
+            block[i] = 0; // Initialize with default values
+        }
+        return block;
+    }
+
+    public static class CacheAccessResult {
+        public final boolean isHit;
+        public final int latency;
+        public final byte value;
+
+        public CacheAccessResult(boolean isHit, int latency, byte value) {
+            this.isHit = isHit;
+            this.latency = latency;
+            this.value = value;
         }
     }
 }
