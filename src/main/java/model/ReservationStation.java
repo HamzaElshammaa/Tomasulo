@@ -251,6 +251,7 @@ public class ReservationStation {
         }
         else{
             if (busy){
+                updateOperands();
                 executeCycle();
             }
         }

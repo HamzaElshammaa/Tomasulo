@@ -12,15 +12,16 @@ public class TomasuloEngine {
     static int missPenalty = 10;
     static int memorySize = 1000;
 
+    //Bus
+    public static Bus bus = new Bus();
+
     //registerFiles
-    public static RegisterFile fp_registerFile = new RegisterFile(new double[] {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0});
-    public static RegisterFile int_registerFile = new RegisterFile(new double[] {0, 0, 0, 2, 0, 0, 0});
+    public static RegisterFile fp_registerFile = new RegisterFile(new double[] {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0}, bus);
+    public static RegisterFile int_registerFile = new RegisterFile(new double[] {0, 0, 0, 2, 0, 0, 0}, bus);
 
     //clock
     static Clock clock = new Clock(0);
 
-    //Bus
-    public static Bus bus = new Bus();
 
     //cache
     static Cache cache = new Cache(cacheSize,blockSize,1,missPenalty);
@@ -84,7 +85,8 @@ public class TomasuloEngine {
         int i = 0;
         while(i < 21){
             i++;
-            
+
+            System.out.println("------------------------------------------------------------------------------------------- \n");
             System.out.println("\n" + "Clock Cycle: " + clock.getCycle());
 
             if(clock.getCycle() == 0){
@@ -98,10 +100,19 @@ public class TomasuloEngine {
                 System.out.println("No more instructions to be fetched");
             }
             additionUnitStations.runCycle();
+            multiplicationUnitStations.runCycle();
 
-            System.out.println("ADD/SUB RS \n" + additionUnitStations);
+            System.out.println("ADD RS \n" + additionUnitStations);
+            System.out.println("////// \n");
+            System.out.println("MULT RS \n" + multiplicationUnitStations);
 
+            bus.writeBackNext();
+            fp_registerFile.updateRegisterFile();
+            int_registerFile.updateRegisterFile();
 
+            System.out.println(fp_registerFile);
+
+            System.out.println("------------------------------------------------------------------------------------------- \n");
 
 
             clock.increment();

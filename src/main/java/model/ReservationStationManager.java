@@ -143,6 +143,16 @@ public class ReservationStationManager {
         }
     }
 
+    public boolean allEmpty() {
+        for (ReservationStation rs : reservationStations) {
+            if (rs.isBusy()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (ReservationStation rs : reservationStations) {
