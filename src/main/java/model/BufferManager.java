@@ -25,9 +25,10 @@ public class BufferManager {
     private final RegisterFile int_registerFiles;
     private final Bus bus;
     private final Clock clock;
+    private DataMemory dataMemory;
 
     //constructor
-    public BufferManager(Buffer.BufferType type, int numberOfBuffers, int latency, RegisterFile fpRegisterFile, RegisterFile intRegisterFile,Bus bus, Clock clock){
+    public BufferManager(Buffer.BufferType type, int numberOfBuffers, int latency, RegisterFile fpRegisterFile, RegisterFile intRegisterFile,Bus bus, Clock clock, DataMemory dataMemory){
         this.bufferType = type;
         this.buffers = new Buffer[numberOfBuffers];
         this.fp_registerFile = fpRegisterFile;
@@ -35,6 +36,7 @@ public class BufferManager {
         this.bus = bus;
         this.clock = clock;
         this.waitingInstructions = new ArrayList<>();
+        this.dataMemory = dataMemory;
 
         //init buffers array
         for(int i = 0; i < numberOfBuffers; i++){
@@ -42,7 +44,7 @@ public class BufferManager {
             Tag.Source src = (bufferType == Buffer.BufferType.LOAD) ? L : S;
             Tag tag = new Tag(src,i);
             //create new buffer and add it to the array
-            buffers[i] = new Buffer(tag, type, latency, bus);
+            buffers[i] = new Buffer(tag, type, latency, bus,dataMemory,fpRegisterFile,intRegisterFile);
         }
     }
 
@@ -104,9 +106,9 @@ public class BufferManager {
     }
 
     public void runCycle(){
+        attemptToIssueInstructions();
         for(Buffer buffer : buffers){
             buffer.runCycle();
         }
     }
-
 }
