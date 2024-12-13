@@ -8,6 +8,17 @@ public class TomasuloEngine {
     static int cacheSize;
     static int missPenalty;
 
+    //registerFiles
+    public static RegisterFile fp_registerFile = new RegisterFile(new double[] {0.2, 0.3, 1.3, 2.0, 0.0, 0.0, 0.0});
+    public static RegisterFile int_registerFile = new RegisterFile(new double[] {0, 0, 0, 2, 0, 0, 0});
+
+    //clock
+    static Clock clock = new Clock(0);
+
+    //Bus
+    public static Bus bus = new Bus();
+
+
     //latencies
     static int additionUnitLatency; //for FP ADD & SUB
     static int multiplicationUnitLatency; //for FP MUL & DIV
@@ -16,42 +27,24 @@ public class TomasuloEngine {
     static int additionUnitSize;
     static int multiplicationUnitSize;
 
-    //other
-    static int clockCycle = 0;
-    static String instructionsFilePath;
-    static String registerContentsFilePath;
-
     //RS
-    static ReservationStation []  additionUnitStations;
-    static ReservationStation []  multiplicationUnitStations;
+    static ReservationStationManager additionUnitStations = new ReservationStationManager(ReservationStation.Type.ADD,additionUnitSize, additionUnitLatency,fp_registerFile, int_registerFile, bus, clock);
+    static ReservationStationManager multiplicationUnitStations = new ReservationStationManager(ReservationStation.Type.MULT,multiplicationUnitSize, multiplicationUnitLatency,fp_registerFile, int_registerFile, bus, clock);
 
-    //registerFiles
-    private RegisterFile fp_registerFile;
-    private RegisterFile int_registerFile;
+
+    //other
+    static String instructionsFilePath;
+
 
     public static void init(){
         InstructionQueue instructionQueue = new InstructionQueue(instructionsFilePath);
-        //call reg file
-        additionUnitStations = new ReservationStation[additionUnitSize];
-        multiplicationUnitStations = new ReservationStation[multiplicationUnitSize];
+
 
     }
-
-//    static ReservationStation rs = new ReservationStation("ADD", ReservationStation.Type.ADD,5);
-    static Bus bus = new Bus();
-
-    public static void busBroadcast(BusData busData){
-//        rs.BusDataInput(bus.busDataValue);
-    }
-
-//    public static CompiledInstruction fetchInstruction(){
-//        InstructionUnit fetchedInstruction;
-//        return new CompiledInstruction(fetchedInstruction);
-//    }
 
     public static void Main (String[] args) {
         while(true){
-            clockCycle++;
+            clock.increment();
         }
     }
 

@@ -4,7 +4,7 @@ public class RegisterFile {
     private final Q[] qi; // Array of Q objects representing registers
 
     // Constructor with initial values
-    public RegisterFile(int[] initialValues) {
+    public RegisterFile(double [] initialValues) {
         if (initialValues == null || initialValues.length == 0) {
             throw new IllegalArgumentException("Initial values array must not be null or empty.");
         }
@@ -14,7 +14,7 @@ public class RegisterFile {
 
         // Populate the qi array with initial values
         for (int i = 0; i < initialValues.length; i++) {
-            this.qi[i] = new Q();
+            this.qi[i] = new Q(Q.DataType.R, 0);
             this.qi[i].type = Q.DataType.R; // Default to real value (ready)
             this.qi[i].value = initialValues[i]; // Assign the initial value
         }

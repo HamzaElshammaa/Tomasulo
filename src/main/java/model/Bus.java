@@ -1,77 +1,70 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Bus {
 
-    // List of items waiting to be issued
-    private List<String> issueQueue;
+    public static class WriteBackData {
+        BusData busData;
+        int priority;
+
+        public WriteBackData(BusData busData, int priority) {
+            this.busData = busData;
+            this.priority = priority;
+        }
+    }
+
+
 
     // List of items waiting to write back
-    private List<String> writebackQueue;
+    private final List<WriteBackData> writeBackQueue;
 
-    private BusData busDataValue;
+    public void setBusData(BusData busData) {
+        this.busData = busData;
+    }
 
-    public BusData getBusDataValue() {
-        return busDataValue;
+    private BusData busData;
+
+    public BusData getBusData() {
+        return busData;
     }
 
     // Constructor
     public Bus() {
-        this.issueQueue = new ArrayList<>();
-        this.writebackQueue = new ArrayList<>();
-    }
-
-    // Add an item to the issue queue
-    public void addToIssueQueue(String item) {
-        issueQueue.add(item);
-    }
-
-    // Remove and return the next item to be issued
-    public String issueNext() {
-        if (!issueQueue.isEmpty()) {
-            return issueQueue.remove(0); // Remove and return the first item
-        }
-        return null; // Return null if the queue is empty
+        this.writeBackQueue = new ArrayList<>();
     }
 
     // Add an item to the writeback queue
-    public void addToWritebackQueue(String item) {
-        writebackQueue.add(item);
+    public void addToWritebackQueue(BusData busData, int priority) {
+        writeBackQueue.add(new WriteBackData(busData, priority));
+        // Sort the queue to ensure the lowest priority comes first
+        writeBackQueue.sort(Comparator.comparingInt(data -> data.priority));
     }
 
     // Remove and return the next writeback item
-    public String writeBackNext() {
-        if (!writebackQueue.isEmpty()) {
-            return writebackQueue.remove(0); // Remove and return the first item
+    public BusData writeBackNext() {
+        if (!writeBackQueue.isEmpty()) {
+            return writeBackQueue.removeFirst().busData; // Remove and return the first item
         }
         return null; // Return null if the queue is empty
     }
 
-    // Check if the issue queue is empty
-    public boolean isIssueQueueEmpty() {
-        return issueQueue.isEmpty();
-    }
 
     // Check if the writeback queue is empty
     public boolean isWritebackQueueEmpty() {
-        return writebackQueue.isEmpty();
+        return writeBackQueue.isEmpty();
     }
 
-    // Get the current size of the issue queue
-    public int getIssueQueueSize() {
-        return issueQueue.size();
-    }
 
     // Get the current size of the writeback queue
     public int getWritebackQueueSize() {
-        return writebackQueue.size();
+        return writeBackQueue.size();
     }
 
-    // Debugging: Print the contents of both queues
+    // Debugging: Print the contents of the writeback queue
     public void printBusState() {
-        System.out.println("Issue Queue: " + issueQueue);
-        System.out.println("Writeback Queue: " + writebackQueue);
+        System.out.println("Writeback Queue: " + writeBackQueue);
     }
 }

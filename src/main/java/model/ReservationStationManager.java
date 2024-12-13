@@ -7,18 +7,32 @@ import static model.Tag.source.A;
 import static model.Tag.source.M;
 
 public class ReservationStationManager {
+    public static class IssueData {
+        CompiledInstruction instruction;
+        int enteredCycle;
+
+        public IssueData(CompiledInstruction instruction, int enteredCycle) {
+            this.instruction = instruction;
+            this.enteredCycle = enteredCycle; //should be equal the cycle it emtered in
+        }
+    }
+
     private final ReservationStation.Type type; // Type of the reservation stations (ADD or MULT)
     private final ReservationStation[] reservationStations; // Array of reservation stations
-    private final List<CompiledInstruction> waitingInstructions; // List of instructions waiting for RS
+    private final List<IssueData> waitingInstructions; // List of instructions waiting for RS
     private final RegisterFile fp_registerFile;
     private final RegisterFile int_registerFile;
+    private final Bus bus;
+    private final Clock clock;
 
     // Constructor
-    public ReservationStationManager(ReservationStation.Type type, int numberOfStations, int latency, RegisterFile fpRegisterFile, RegisterFile intRegisterFile) {
+    public ReservationStationManager(ReservationStation.Type type, int numberOfStations, int latency, RegisterFile fpRegisterFile, RegisterFile intRegisterFile, Bus bus, Clock clock) {
         this.type = type;
         this.reservationStations = new ReservationStation[numberOfStations];
         fp_registerFile = fpRegisterFile;
         int_registerFile = intRegisterFile;
+        this.bus = bus;
+        this.clock = clock;
         this.waitingInstructions = new ArrayList<>();
 
         // Initialize the reservation stations array
@@ -29,33 +43,26 @@ public class ReservationStationManager {
             tag.index = i;
 
             // Create a new reservation station and add it to the array
-            reservationStations[i] = new ReservationStation(tag, type, latency);
+            reservationStations[i] = new ReservationStation(tag, type, latency,fpRegisterFile, intRegisterFile, bus);
         }
     }
 
     // Add an instruction to the waiting list
-    public void addToWaitingList(CompiledInstruction instruction) {
-        waitingInstructions.add(instruction);
+    public void issueInstruction(CompiledInstruction instruction) {
+        waitingInstructions.add(new IssueData(instruction, clock.getCycle()));
     }
 
     // Attempt to issue instructions from the waiting list
     public void attemptToIssueInstructions() {
-        List<CompiledInstruction> issuedInstructions = new ArrayList<>();
+        List<IssueData> issuedInstructions = new ArrayList<>();
 
         // Iterate over the waiting instructions
-        for (CompiledInstruction instruction : waitingInstructions) {
+        for (IssueData instruction : waitingInstructions) {
             ReservationStation freeRS = findFreeStation();
 
             if (freeRS != null) {
                 // Issue the instruction to the free RS
-                freeRS.issue(instruction.operation);
-
-                freeRS.setBusy(true);
-                //do register file to cont.....
-                // Assign operands to the RS
-//                freeRS.vj = instruction.source1 != null ? instruction.source1.index : 0; // Example logic
-//                freeRS.vk = instruction.source2 != null ? instruction.source2.index : 0; // Example logic
-
+                freeRS.issue(instruction.instruction, instruction.enteredCycle);
                 // Mark the RS as busy and remove the instruction from the waiting list
                 issuedInstructions.add(instruction);
             }
@@ -106,5 +113,11 @@ public class ReservationStationManager {
             System.out.println("Station " + i + " - Busy: " + rs.isBusy() + ", Result Ready: ");
         }
         System.out.println("Waiting Instructions: " + waitingInstructions.size());
+    }
+
+    public void runCycle() {
+        for (ReservationStation rs : reservationStations) {
+            rs.runCycle();
+        }
     }
 }

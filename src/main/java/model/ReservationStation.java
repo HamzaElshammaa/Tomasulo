@@ -4,8 +4,7 @@ package model;
 
 import static model.Operation.OperationType;
 import static model.Operation.OperationType.ADD;
-import static model.Tag.source.A;
-import static model.Tag.source.M;
+import static model.Tag.source.*;
 
 public class ReservationStation {
     public enum Type{
@@ -15,6 +14,18 @@ public class ReservationStation {
 
     //keep track of the cycles
     private final int latency;
+    private int cycles;
+
+    //enter time to set priority
+    private int enterTime = -1;
+    boolean addedToWriteBackQueue = false;
+
+    //bus
+    private final Bus bus;
+
+    //register files
+    private final RegisterFile fp_registerFile;
+    private final RegisterFile int_registerFile;
 
     public void setVj(double vj) {
         this.vj = vj;
@@ -36,7 +47,7 @@ public class ReservationStation {
         this.busy = busy;
     }
 
-    private int cycles;
+
 
     //tag name to compare with the bus input tag to erase and to determine the output busData tag
     private final Tag tag; //Name of station
@@ -74,16 +85,14 @@ public class ReservationStation {
     //other
     private double result; //computed result
     private boolean resultReady; //if execution is done or not
-    private BusData busData;
-
-    public void BusDataInput(BusData busData){
-        this.busData = busData;
-    }
 
 
-    public ReservationStation(Tag name, Type type, int latency) {
+    public ReservationStation(Tag name, Type type, int latency, RegisterFile fpRegisterFile, RegisterFile intRegisterFile, Bus bus) {
         this.tag = name;
         this.type = type;
+        this.bus = bus;
+        fp_registerFile = fpRegisterFile;
+        int_registerFile = intRegisterFile;
         this.busy = false;
         this.resultReady = false;
         this.latency = latency;
@@ -97,20 +106,51 @@ public class ReservationStation {
 
     void clear(){
         this.operation = null;
-        this.vj = -1;
-        this.vk = -1;
-        this.qj = null;
-        this.qk = null;
-        this.result = -1;
+//        this.vj = -1;
+//        this.vk = -1;
+//        this.qj = null;
+//        this.qk = null;
+//        this.result = -1;
         this.resultReady = false;
         this.busy = false;
-
+        this.addedToWriteBackQueue = false;
     }
 
-    public void issue(Operation operation){ //given already in constructor
+    public void issue(CompiledInstruction instruction, int enterTime){ //given already in constructor
         this.busy = true;
-        this.operation = operation;
+        this.operation = instruction.operation;
         this.cycles = latency;
+        this.enterTime = enterTime;
+        Q operand1;
+        Q operand2;
+        if (instruction.source1.source == FP_REG){
+            operand1 = fp_registerFile.getRegister(instruction.source1.index);
+        }
+        else {
+            operand1 = int_registerFile.getRegister(instruction.source1.index);
+        }
+
+        if (instruction.source2.source == FP_REG){
+            operand2 = fp_registerFile.getRegister(instruction.source2.index);
+        }
+        else {
+            operand2 = int_registerFile.getRegister(instruction.source2.index);
+        }
+
+        if (operand1.type == Q.DataType.R){
+            this.vj = operand1.value;
+        }
+        else {
+            this.qj = operand1;
+        }
+
+        if (operand2.type == Q.DataType.R){
+            this.vk = operand2.value;
+        }
+        else {
+            this.qk = operand2;
+        }
+
         this.result = -1;
     }
 
@@ -174,12 +214,13 @@ public class ReservationStation {
     }
 
     public void updateOperands(){
-        if(QAndTagCompare(qj, tag)){
+        BusData busData = bus.getBusData();
+        if(QAndTagCompare(qj, busData.tag)){
             vj = busData.dataValue.value;
             qj.type = Q.DataType.R;
             qj.value = 0;
         }
-        if(QAndTagCompare(qj, tag)){
+        if(QAndTagCompare(qk, busData.tag)){
             vk = busData.dataValue.value;
             qk.type = Q.DataType.R;
             qk.value = 0;
@@ -187,10 +228,26 @@ public class ReservationStation {
     }
 
     public void clearCurrentStation(){
-        if (busData.tag == this.tag){
+        if (bus.getBusData().tag == this.tag){
             clear();
         }
     }
+
+    public void runCycle(){
+        if (resultReady && !addedToWriteBackQueue){
+            bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
+            addedToWriteBackQueue = true;
+        }
+        else{
+            if (busy){
+                executeCycle();
+            }
+        }
+        clearCurrentStation();
+    }
+
+
+
 
 
 } 

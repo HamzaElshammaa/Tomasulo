@@ -11,4 +11,9 @@ public class Q {
     public DataType type;
     public double value;
 
+    public Q(DataType type, double value) {
+        this.type = type;
+        this.value = value;
+    }
+
 }
