@@ -4,7 +4,7 @@ package model;
 
 import static model.Operation.OperationType;
 import static model.Operation.OperationType.ADD;
-import static model.Tag.source.*;
+import static model.Tag.Source.*;
 
 public class ReservationStation {
     public enum Type{

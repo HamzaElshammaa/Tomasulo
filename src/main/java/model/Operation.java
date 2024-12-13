@@ -13,5 +13,18 @@ public class Operation {
         FP_MULT,
         FP_DIV,
     }
+
     public OperationType operationType;
+
+    public Operation(OperationType operationType) {
+        this.operationType = operationType;
+    }
+
+    public OperationType getOperationType() {
+        return operationType;
+    }
+
+    public String toString() {
+        return "operationType= " + operationType;
+    }
 }
