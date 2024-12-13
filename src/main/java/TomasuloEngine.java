@@ -10,6 +10,7 @@ public class TomasuloEngine {
     static int blockSize;
     static int cacheSize;
     static int missPenalty;
+    static int memorySize;
 
     //registerFiles
     public static RegisterFile fp_registerFile = new RegisterFile(new double[] {0.2, 0.3, 1.3, 2.0, 0.0, 0.0, 0.0, 0.2, 0.3, 1.3, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
@@ -20,6 +21,12 @@ public class TomasuloEngine {
 
     //Bus
     public static Bus bus = new Bus();
+
+    //cache
+    static Cache cache = new Cache(cacheSize,blockSize,1,missPenalty);
+
+    //DataMemory
+    static DataMemory dataMemory = new DataMemory(memorySize,cache);
 
     public static InstructionQueue instructionQueue;
 
@@ -38,8 +45,8 @@ public class TomasuloEngine {
     //RS
     static ReservationStationManager additionUnitStations = new ReservationStationManager(ReservationStation.Type.ADD,additionUnitSize, additionUnitLatency,fp_registerFile, int_registerFile, bus, clock);
     static ReservationStationManager multiplicationUnitStations = new ReservationStationManager(ReservationStation.Type.MULT,multiplicationUnitSize, multiplicationUnitLatency,fp_registerFile, int_registerFile, bus, clock);
-    static BufferManager loadUnitBuffer = new BufferManager(Buffer.BufferType.LOAD, loadUnitSize, loadUnitLatency, fp_registerFile, int_registerFile, bus, clock);
-    static BufferManager storeUnitBuffer = new BufferManager(Buffer.BufferType.STORE, storeUnitSize, storeUnitLatency, fp_registerFile, int_registerFile, bus, clock);
+    static BufferManager loadUnitBuffer = new BufferManager(Buffer.BufferType.LOAD, loadUnitSize, loadUnitLatency, fp_registerFile, int_registerFile, bus, clock, dataMemory);
+    static BufferManager storeUnitBuffer = new BufferManager(Buffer.BufferType.STORE, storeUnitSize, storeUnitLatency, fp_registerFile, int_registerFile, bus, clock, dataMemory);
 
     //other
     static String instructionsFilePath;
