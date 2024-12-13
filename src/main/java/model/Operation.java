@@ -7,6 +7,24 @@ public class Operation {
         MULT,
         DIV,
         LOAD,
-        STORE
+        STORE,
+        FP_ADD,
+        FP_SUB,
+        FP_MULT,
+        FP_DIV,
+    }
+
+    public OperationType operationType;
+
+    public Operation(OperationType operationType) {
+        this.operationType = operationType;
+    }
+
+    public OperationType getOperationType() {
+        return operationType;
+    }
+
+    public String toString() {
+        return "operationType= " + operationType;
     }
 }

@@ -10,21 +10,19 @@ public class CompiledInstruction {
         BRANCH      // BEQ, BNE
     }
 
-    InstructionType instructionOperation;
     Operation operation; //needed for rs communication
     Tag destination;
     Tag source1;
     Tag source2;
 
-    public CompiledInstruction(InstructionUnit instruction) { //given as a string ex: MUL R1 R2 R3
-//        switch case (instruction.operation) {
-//            "R","F", default:
-//        }
-
-        //{FP_ADD, {FP_REG 1}, {FP_REG 2}, {IMM 5}}
-        this.instructionOperation = instructionOperation;
-        this.destination = source1;
+    public CompiledInstruction(Operation operation, Tag destination, Tag source1, Tag source2) {
+        this.operation = operation;
+        this.destination = destination;
         this.source1 = source1;
         this.source2 = source2;
+    }
+
+    public String toString() {
+        return operation + " " + destination + " " + source1 + " " + source2 + "\n";
     }
 }
