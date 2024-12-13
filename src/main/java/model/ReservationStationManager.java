@@ -3,8 +3,8 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import static model.Tag.source.A;
-import static model.Tag.source.M;
+import static model.Tag.Source.A;
+import static model.Tag.Source.M;
 
 public class ReservationStationManager {
     public static class IssueData {
