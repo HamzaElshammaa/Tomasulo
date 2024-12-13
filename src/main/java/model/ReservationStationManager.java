@@ -3,8 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import static model.Tag.Source.M;
-import static model.Tag.Source.A;
+import static model.Tag.Source.*;
 
 
 public class ReservationStationManager {
@@ -51,6 +50,20 @@ public class ReservationStationManager {
         waitingInstructions.add(new IssueData(instruction, clock.getCycle()));
     }
 
+    public Q transformTagToQ(Tag tag) {
+        if (tag == null) {
+            throw new IllegalArgumentException("Tag cannot be null");
+        }
+
+        return switch (tag.source) {
+            case A -> // Waiting for Add
+                    new Q(Q.DataType.A, tag.index);
+            case M -> // Waiting for Mult
+                    new Q(Q.DataType.M, tag.index);
+            default -> throw new IllegalArgumentException("Unknown Tag source: " + tag.source);
+        };
+    }
+
     // Attempt to issue instructions from the waiting list
     public void attemptToIssueInstructions() {
         List<IssueData> issuedInstructions = new ArrayList<>();
@@ -64,6 +77,15 @@ public class ReservationStationManager {
                 freeRS.issue(instruction.instruction, instruction.enteredCycle);
                 // Mark the RS as busy and remove the instruction from the waiting list
                 issuedInstructions.add(instruction);
+                // Destination Tag to reg file
+                Tag destination = instruction.instruction.destination;
+
+                if (destination.source == FP_REG){
+                    fp_registerFile.setRegister(destination.index, transformTagToQ(freeRS.getTag()));
+                }
+                else{
+                    int_registerFile.setRegister(destination.index, transformTagToQ(freeRS.getTag()));
+                }
             }
         }
 
@@ -115,6 +137,7 @@ public class ReservationStationManager {
     }
 
     public void runCycle() {
+        attemptToIssueInstructions();
         for (ReservationStation rs : reservationStations) {
             rs.runCycle();
         }

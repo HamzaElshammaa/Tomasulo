@@ -48,6 +48,9 @@ public class ReservationStation {
     }
 
 
+    public Tag getTag() {
+        return tag;
+    }
 
     //tag name to compare with the bus input tag to erase and to determine the output busData tag
     private final Tag tag; //Name of station
@@ -126,12 +129,18 @@ public class ReservationStation {
         if (instruction.source1.source == FP_REG){
             operand1 = fp_registerFile.getRegister(instruction.source1.index);
         }
+        else if (instruction.source1.source == IMM){
+            operand1 = new Q(Q.DataType.R, instruction.source2.index);
+        }
         else {
             operand1 = int_registerFile.getRegister(instruction.source1.index);
         }
 
         if (instruction.source2.source == FP_REG){
             operand2 = fp_registerFile.getRegister(instruction.source2.index);
+        }
+        else if (instruction.source2.source == IMM){
+            operand2 = new Q(Q.DataType.R, instruction.source2.index);
         }
         else {
             operand2 = int_registerFile.getRegister(instruction.source2.index);
