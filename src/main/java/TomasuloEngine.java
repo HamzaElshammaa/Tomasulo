@@ -107,12 +107,12 @@ public class TomasuloEngine {
             System.out.println("////// \n");
             System.out.println("MULT RS \n" + multiplicationUnitStations);
 
+            fp_registerFile.updateRegisterFile();
+            int_registerFile.updateRegisterFile();
+
             bus.writeBackNext();
             System.out.println("bus current: " + bus);
             System.out.println(fp_registerFile);
-
-            fp_registerFile.updateRegisterFile();
-            int_registerFile.updateRegisterFile();
 
             System.out.println("------------------------------------------------------------------------------------------- \n");
 
