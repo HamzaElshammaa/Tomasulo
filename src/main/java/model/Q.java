@@ -9,6 +9,11 @@ public class Q {
     }
 
     public DataType type;
-    public int value;
+    public double value;
+
+    public Q(DataType type, double value) {
+        this.type = type;
+        this.value = value;
+    }
 
 }
