@@ -22,10 +22,6 @@ public class CompiledInstruction {
         this.source2 = source2;
     }
 
-    public Operation getOperation() {
-        return operation;
-    }
-
 
     public String toString() {
         return operation + " " + destination + " " + source1 + " " + source2 + "\n";
