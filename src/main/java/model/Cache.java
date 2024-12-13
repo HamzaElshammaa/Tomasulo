@@ -2,25 +2,26 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
+//cash
 public class Cache {
     private final int cacheSize;      // in bytes
     private final int blockSize;      // in bytes
     private final int numberOfBlocks;
     private final int hitLatency;     // cycles
     private final int missLatency;    // cycles
-    
+
     private static class CacheBlock {
         boolean valid;
         int tag;
         byte[] data;
-        
+
         public CacheBlock(int blockSize) {
             this.valid = false;
             this.tag = -1;
             this.data = new byte[blockSize];
         }
     }
-    
+
     private final CacheBlock[] blocks;
     private final Map<Integer, Double> mainMemory; // Simulated main memory: address -> value
 
@@ -30,13 +31,13 @@ public class Cache {
         this.hitLatency = hitLatency;
         this.missLatency = missLatency;
         this.numberOfBlocks = cacheSize / blockSize;
-        
+
         // Initialize cache blocks
         this.blocks = new CacheBlock[numberOfBlocks];
         for (int i = 0; i < numberOfBlocks; i++) {
             blocks[i] = new CacheBlock(blockSize);
         }
-        
+
         // Initialize simulated main memory
         this.mainMemory = new HashMap<>();
     }
@@ -45,24 +46,24 @@ public class Cache {
         int blockOffset = address % blockSize;
         int blockIndex = (address / blockSize) % numberOfBlocks;
         int tag = address / (blockSize * numberOfBlocks);
-        
+
         CacheBlock block = blocks[blockIndex];
-        
+
         // Cache hit
         if (block.valid && block.tag == tag) {
             return new CacheAccessResult(
-                true,
-                hitLatency,
-                getValueFromMainMemory(address)
+                    true,
+                    hitLatency,
+                    getValueFromMainMemory(address)
             );
         }
-        
+
         // Cache miss
         handleCacheMiss(address, blockIndex, tag);
         return new CacheAccessResult(
-            false,
-            missLatency,
-            getValueFromMainMemory(address)
+                false,
+                missLatency,
+                getValueFromMainMemory(address)
         );
     }
 
@@ -70,18 +71,18 @@ public class Cache {
         int blockOffset = address % blockSize;
         int blockIndex = (address / blockSize) % numberOfBlocks;
         int tag = address / (blockSize * numberOfBlocks);
-        
+
         CacheBlock block = blocks[blockIndex];
-        
+
         // Update main memory
         mainMemory.put(address, value);
-        
+
         // Cache hit
         if (block.valid && block.tag == tag) {
             // Write-through policy
             return new CacheAccessResult(true, hitLatency, value);
         }
-        
+
         // Cache miss
         handleCacheMiss(address, blockIndex, tag);
         return new CacheAccessResult(false, missLatency, value);
@@ -91,7 +92,7 @@ public class Cache {
         CacheBlock block = blocks[blockIndex];
         block.valid = true;
         block.tag = tag;
-        
+
         // Load the entire block from main memory
         int blockStartAddress = address - (address % blockSize);
         for (int i = 0; i < blockSize; i++) {
@@ -121,12 +122,12 @@ public class Cache {
             if (block.valid) validBlocks++;
         }
         return new CacheStatistics(
-            cacheSize,
-            blockSize,
-            numberOfBlocks,
-            validBlocks,
-            hitLatency,
-            missLatency
+                cacheSize,
+                blockSize,
+                numberOfBlocks,
+                validBlocks,
+                hitLatency,
+                missLatency
         );
     }
 
@@ -152,8 +153,8 @@ public class Cache {
         public final int hitLatency;
         public final int missLatency;
 
-        public CacheStatistics(int cacheSize, int blockSize, int totalBlocks, 
-                             int validBlocks, int hitLatency, int missLatency) {
+        public CacheStatistics(int cacheSize, int blockSize, int totalBlocks,
+                               int validBlocks, int hitLatency, int missLatency) {
             this.cacheSize = cacheSize;
             this.blockSize = blockSize;
             this.totalBlocks = totalBlocks;
@@ -162,4 +163,4 @@ public class Cache {
             this.missLatency = missLatency;
         }
     }
-} 
+}
