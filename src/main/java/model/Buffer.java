@@ -1,5 +1,5 @@
 package model;
-
+//Latest Cache-Buffer-DataMemory
 public class Buffer {
     public enum BufferType {
         LOAD,
