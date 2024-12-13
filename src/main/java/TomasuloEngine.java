@@ -54,8 +54,8 @@ public class TomasuloEngine {
 
 
     public static void init(){
-//        String filePath = "D:\\Uni\\Semester 7\\Microprocessors\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
-        String filePath = "C:\\Sem 7\\Microprocessors\\simulationProject\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
+        String filePath = "D:\\Uni\\Semester 7\\Microprocessors\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
+        //String filePath = "C:\\Sem 7\\Microprocessors\\simulationProject\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         // Load raw instructions from the file
         List<String> rawInstructions = InstructionQueue.loadRawInstructions(filePath);
 
@@ -102,17 +102,18 @@ public class TomasuloEngine {
 
             additionUnitStations.runCycle();
             multiplicationUnitStations.runCycle();
+            bus.writeBackNext();
 
             System.out.println("ADD RS \n" + additionUnitStations);
             System.out.println("////// \n");
             System.out.println("MULT RS \n" + multiplicationUnitStations);
 
-            bus.writeBackNext();
             System.out.println("bus current: " + bus);
-            System.out.println(fp_registerFile);
 
             fp_registerFile.updateRegisterFile();
             int_registerFile.updateRegisterFile();
+
+            System.out.println(fp_registerFile);
 
             System.out.println("------------------------------------------------------------------------------------------- \n");
 

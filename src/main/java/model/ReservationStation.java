@@ -122,7 +122,6 @@ public class ReservationStation {
     }
 
     public void issue(CompiledInstruction instruction, int enterTime){ //given already in constructor
-        System.out.println("ISSUEDDD" + tag + instruction.source2);
         this.busy = true;
         this.operation = instruction.operation;
         this.cycles = latency;
@@ -133,7 +132,7 @@ public class ReservationStation {
             operand1 = fp_registerFile.getRegister(instruction.source1.index);
         }
         else if (instruction.source1.source == IMM){
-            operand1 = new Q(Q.DataType.R, instruction.source2.index);
+            operand1 = new Q(Q.DataType.R, instruction.source1.index);
         }
         else {
             operand1 = int_registerFile.getRegister(instruction.source1.index);
@@ -229,13 +228,17 @@ public class ReservationStation {
         BusData busData = bus.getBusData();
         if(QAndTagCompare(qj, busData.tag)){
             vj = busData.dataValue.value;
-            qj.type = Q.DataType.R;
-            qj.value = 0;
+            qj = new Q(Q.DataType.R, 0);
         }
         if(QAndTagCompare(qk, busData.tag)){
             vk = busData.dataValue.value;
-            qk.type = Q.DataType.R;
-            qk.value = 0;
+            qk = new Q(Q.DataType.R, 0);
+        }
+        if(qj.type == Q.DataType.R && qj.value != 0){
+            vj = qj.value;
+        }
+        if(qk.type == Q.DataType.R && qk.value != 0){
+            vk = qk.value;
         }
     }
 
