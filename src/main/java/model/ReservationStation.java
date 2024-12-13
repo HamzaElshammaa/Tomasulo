@@ -129,23 +129,27 @@ public class ReservationStation {
         Q operand1;
         Q operand2;
         if (instruction.source1.source == FP_REG){
-            operand1 = fp_registerFile.getRegister(instruction.source1.index);
+            Q current = fp_registerFile.getRegister(instruction.source1.index);
+            operand1 = new Q(current.type, current.value);
         }
         else if (instruction.source1.source == IMM){
             operand1 = new Q(Q.DataType.R, instruction.source1.index);
         }
         else {
-            operand1 = int_registerFile.getRegister(instruction.source1.index);
+            Q current = int_registerFile.getRegister(instruction.source1.index);
+            operand1 = new Q(current.type, current.value);
         }
 
         if (instruction.source2.source == FP_REG){
-            operand2 = fp_registerFile.getRegister(instruction.source2.index);
+            Q current = fp_registerFile.getRegister(instruction.source2.index);
+            operand2 = new Q(current.type, current.value);
         }
         else if (instruction.source2.source == IMM){
             operand2 = new Q(Q.DataType.R, instruction.source2.index);
         }
         else {
-            operand2 = int_registerFile.getRegister(instruction.source2.index);
+            Q current = int_registerFile.getRegister(instruction.source2.index);
+            operand2 = new Q(current.type, current.value);
         }
 
         if (operand1.type == Q.DataType.R){
@@ -233,12 +237,6 @@ public class ReservationStation {
         if(QAndTagCompare(qk, busData.tag)){
             vk = busData.dataValue.value;
             qk = new Q(Q.DataType.R, 0);
-        }
-        if(qj.type == Q.DataType.R && qj.value != 0){
-            vj = qj.value;
-        }
-        if(qk.type == Q.DataType.R && qk.value != 0){
-            vk = qk.value;
         }
     }
 
