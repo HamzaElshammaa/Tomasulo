@@ -41,8 +41,43 @@ public class TomasuloEngine {
     //other
     static String instructionsFilePath;
 
+    public static ReservationStationManager additionUnitStations;
+    public static ReservationStationManager multiplicationUnitStations;
+    public static BufferManager loadUnitBuffer;
+    public static BufferManager storeUnitBuffer;
+
+    public static Cache cache;
+    public static Clock clock;
+    public static DataMemory dataMemory;
 
     public static void init(){
+         bus = new Bus();
+        //registerFiles
+          fp_registerFile = new RegisterFile(new double[] {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0}, bus);
+          int_registerFile = new RegisterFile(new double[] {0, 0, 0, 2, 0, 0, 0}, bus);
+
+
+        //clock
+         clock = new Clock(0);
+
+
+        //cache
+         cache = new Cache(cacheSize,blockSize,1,missPenalty);
+
+        //DataMemory
+         dataMemory = new DataMemory(memorySize,cache);
+
+        //RS
+          additionUnitStations = new ReservationStationManager(ReservationStation.Type.ADD,additionUnitSize, additionUnitLatency,fp_registerFile, int_registerFile, bus, clock);
+          multiplicationUnitStations = new ReservationStationManager(ReservationStation.Type.MULT,multiplicationUnitSize, multiplicationUnitLatency,fp_registerFile, int_registerFile, bus, clock);
+          loadUnitBuffer = new BufferManager(Buffer.BufferType.LOAD, loadUnitSize, loadUnitLatency, fp_registerFile, int_registerFile, bus, clock, dataMemory);
+          storeUnitBuffer = new BufferManager(Buffer.BufferType.STORE, storeUnitSize, storeUnitLatency, fp_registerFile, int_registerFile, bus, clock, dataMemory);
+
+
+
+
+
+
         String filePath = "C:\\Users\\mozam\\OneDrive\\Uni\\Semester 7\\CSEN702 Microprocessors\\Micro Project 2\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         //String filePath = "C:\\Sem 7\\Microprocessors\\simulationProject\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         // Load raw instructions from the file
