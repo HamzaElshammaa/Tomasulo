@@ -122,4 +122,8 @@ public class InstructionQueue {
 
         System.out.println(instructionQueue);
     }
+
+    public List<CompiledInstruction> getInstructions() {
+        return new ArrayList<>(this.instructions); // Return a copy of the instructions
+    }
 }

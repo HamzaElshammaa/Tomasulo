@@ -71,7 +71,7 @@ public class RegisterFile {
                 typeMatches = tag.source == Tag.Source.M;
                 break;
             case L:
-                typeMatches = tag.source == Tag.Source.REG;
+                typeMatches = tag.source == Tag.Source.L;
                 break;
             default:
                 break;

@@ -1,11 +1,9 @@
-/*
+
 package model;
 
-//Clear logic when bus broadcasts tag same as yours
-
-import javax.xml.crypto.Data;
-
 public class Buffer {
+
+
     public enum BufferType {
         LOAD,
         STORE
@@ -15,200 +13,8 @@ public class Buffer {
     private final BufferType type;
     private boolean busy;
     private Double value;
-    private Tag valueSourceTag;
     private Tag addressTag;
-    private boolean addressReady;
-    private int cycles;
-    private boolean executed;
-    private final Bus bus;
-    private final int latency;
-    private int enterTime = -1;
-    private boolean addedToWriteBackQueue = false;
-    private DataMemory dataMemory;
-
-    public Buffer(Tag tag, BufferType type, int latency, Bus bus, DataMemory dataMemory) {
-        this.tag = tag;
-        this.type = type;
-        this.latency = latency;
-        this.bus = bus;
-        this.dataMemory = dataMemory;
-        clear();
-    }
-
-    public boolean isBusy() {
-        return busy;
-    }
-    public void clear() {
-        this.busy = false;
-        this.value = null;
-        this.valueSourceTag = null;
-        this.addressReady = false;
-        this.cycles = 0;
-        this.executed = false;
-        this.addedToWriteBackQueue = false;
-        this.addressTag = null;
-    }
-
-    // Issue a new memory operation using a CompiledInstruction
-    public void issue(CompiledInstruction instruction, int enterTime) {
-        this.busy = true;
-        this.cycles = latency;
-        this.enterTime = enterTime;
-        this.executed = false;
-
-        if (type == BufferType.STORE) {
-            // For store operations, set the value source from the instruction's source2 tag
-            this.valueSourceTag = instruction.source1;
-        }
-
-    }
-
-    public void setStoreValue(Double value, Tag sourceTag) {
-        if (type != BufferType.STORE) {
-            throw new IllegalStateException("Cannot set store value for load buffer");
-        }
-        this.value = value;
-        this.valueSourceTag = sourceTag;
-    }
-
-    public void updateValue(Tag sourceTag, double value) {
-        if (valueSourceTag != null && valueSourceTag.equals(sourceTag)) {
-            this.value = value;
-            this.valueSourceTag = null;
-        }
-    }
-
-    public boolean isReadyToExecute() {
-        if (!busy || cycles <= 0 || executed) {
-            return false;
-        }
-
-        if (type == BufferType.LOAD) {
-            return addressReady;
-        } else {
-            return addressReady && value != null && valueSourceTag == null;
-        }
-    }
-
-    public void ExecuteLoad(){
-        DataMemory.MemoryAccessResult result = dataMemory.load(addressTag.index);
-    }
-
-
-    public boolean executeCycle() {
-        if (!isReadyToExecute()) {
-            return false;
-        }
-
-        cycles--;
-        if (cycles == 0) {
-            executed = true;
-            broadcastResult();
-            return true;
-        }
-        return false;
-    }
-
-    private void broadcastResult() {
-        if (type == BufferType.LOAD || type == BufferType.STORE) {
-            bus.addToWritebackQueue(new BusData(tag, new Q(Q.DataType.R, value)), enterTime);
-        }
-    }
-
-    public void runCycle() {
-        if (executed && !addedToWriteBackQueue) {
-            broadcastResult();
-            addedToWriteBackQueue = true;
-        } else if (busy) {
-            executeCycle();
-        }
-    }
-
-    // Getters and setters...
-
-    // Main method for testing
-    public static void main(String[] args) {
-        // Create a bus
-        Bus bus = new Bus();
-        Cache cache = new Cache(1,1,1,1);
-        DataMemory dataMemory = new DataMemory(2,cache);
-
-        // Create load and store buffers with tags as names
-        Buffer loadBuffer = new Buffer(new Tag(Tag.Source.L, 0), Buffer.BufferType.LOAD, 3, bus, dataMemory);
-        Buffer storeBuffer = new Buffer(new Tag(Tag.Source.S, 1), Buffer.BufferType.STORE, 3, bus, dataMemory);
-
-        // Create compiled instructions
-        CompiledInstruction loadInstruction = new CompiledInstruction(
-            new Operation(Operation.OperationType.LOAD), new Tag(Tag.Source.L, 100), null, null);
-        CompiledInstruction storeInstruction = new CompiledInstruction(
-            new Operation(Operation.OperationType.STORE), new Tag(Tag.Source.S, 200), new Tag(Tag.Source.REG, 1), null);
-
-        // Issue operations using compiled instructions
-        System.out.println("Issuing load operation to Load1...");
-        loadBuffer.issue(loadInstruction, 0);
-        loadBuffer.addressReady = true;
-        printBufferState(loadBuffer);
-
-        System.out.println("Issuing store operation to Store1...");
-        storeBuffer.issue(storeInstruction, 0);
-        storeBuffer.addressReady = true;
-        printBufferState(storeBuffer);
-
-        // Simulate value update
-        System.out.println("Broadcasting result from REG1...");
-        storeBuffer.updateValue(new Tag(Tag.Source.REG, 1), 3.14);
-        printBufferState(storeBuffer);
-
-        // Execute cycles for load buffer
-        System.out.println("Executing cycles for Load1...");
-        while (loadBuffer.isReadyToExecute()) {
-            boolean completed = loadBuffer.executeCycle();
-            printBufferState(loadBuffer);
-            if (completed) {
-                System.out.println("Load operation completed.");
-            }
-        }
-
-        // Execute cycles for store buffer
-        System.out.println("Executing cycles for Store1...");
-        while (storeBuffer.isReadyToExecute()) {
-            boolean completed = storeBuffer.executeCycle();
-            printBufferState(storeBuffer);
-            if (completed) {
-                System.out.println("Store operation completed.");
-            }
-        }
-    }
-
-    // Helper method to print the state of a buffer
-    private static void printBufferState(Buffer buffer) {
-        System.out.println("Buffer: " + buffer.tag);
-        System.out.println("  Type: " + buffer.type);
-        System.out.println("  Busy: " + buffer.busy);
-        System.out.println("  Value: " + buffer.value);
-        System.out.println("  Value Source Tag: " + buffer.valueSourceTag);
-        System.out.println("  Address Ready: " + buffer.addressReady);
-        System.out.println("  Remaining Cycles: " + buffer.cycles);
-        System.out.println("  Executed: " + buffer.executed);
-        System.out.println();
-    }
-
-
-}*/
-package model;
-
-public class Buffer {
-    public enum BufferType {
-        LOAD,
-        STORE
-    }
-
-    private final Tag tag; // Use Tag as the name/identifier of the buffer
-    private final BufferType type;
-    private boolean busy;
-    private Double value;
-    private Tag valueSourceTag;
-    private Tag addressTag;
+    private Tag destination;
     private boolean addressReady;
     private int cycles;
     private boolean executed;
@@ -231,6 +37,11 @@ public class Buffer {
         clear();
     }
 
+    public Tag getTag() {
+        return tag;
+    }
+    public BufferType getType() {return type;}
+
     public boolean isBusy() {
         return busy;
     }
@@ -238,39 +49,26 @@ public class Buffer {
     public void clear() {
         this.busy = false;
         this.value = null;
-        this.valueSourceTag = null;
+        this.addressTag = null;
         this.addressReady = false;
         this.cycles = 0;
         this.executed = false;
         this.addedToWriteBackQueue = false;
-        this.addressTag = null;
+        this.destination = null;
     }
 
     // Issue a new memory operation using a CompiledInstruction
     public void issue(CompiledInstruction instruction, int enterTime) {
         this.busy = true;
-        this.cycles = latency;
+        this.cycles = latency+1;
         this.enterTime = enterTime;
         this.executed = false;
 
-        if (type == BufferType.STORE) {
-            // For store operations, set the value source from the instruction's source1 tag
-            this.valueSourceTag = instruction.source1;
-        }
-        this.addressTag = instruction.destination; // Assuming destination holds the address
+
+        this.addressTag = instruction.source1;
+        this.destination = instruction.destination; // Assuming destination holds the address
     }
 
-    public boolean isReadyToExecute() {
-        if (!busy || cycles <= 0 || executed) {
-            return false;
-        }
-
-        if (type == BufferType.LOAD) {
-            return addressReady;
-        } else {
-            return addressReady && value != null && valueSourceTag == null;
-        }
-    }
 
     public void execute() {
         if (type == BufferType.LOAD) {
@@ -291,52 +89,56 @@ public class Buffer {
     }
 
     private void executeStore() {
-        double valueToStore = getValueFromRegister(valueSourceTag); // Retrieve value from source register
-        DataMemory.MemoryAccessResult result = dataMemory.store(addressTag.index, valueToStore);
+        value = getValueFromRegister(addressTag); // Retrieve value from source register
+        DataMemory.MemoryAccessResult result = dataMemory.store(addressTag.index, value);
         if (!result.success) {
             System.out.println("Store error: " + result.error);
         }
     }
 
     private double getValueFromRegister(Tag sourceTag) {
-        if (sourceTag.source == Tag.Source.FP_REG) {
-            return fpRegisterFile.getRegister(sourceTag.index).value;
-        } else if (sourceTag.source == Tag.Source.REG) {
-            return intRegisterFile.getRegister(sourceTag.index).value;
+        if (destination.source == Tag.Source.FP_REG) {
+            return fpRegisterFile.getRegister(destination.index).value;
+        } else if (destination.source == Tag.Source.REG) {
+            return intRegisterFile.getRegister(destination.index).value;
         } else {
             throw new IllegalArgumentException("Invalid source tag for register value retrieval: " + sourceTag);
         }
     }
 
     public boolean executeCycle() {
-        if (!isReadyToExecute()) {
+        if (cycles <= -1) {
             return false;
         }
 
         cycles--;
-        if (cycles == 0) {
+        if (cycles == -1) {
             executed = true;
-            broadcastResult();
+            execute();
             return true;
         }
         return false;
     }
 
-    private void broadcastResult() {
-        if (type == BufferType.LOAD || type == BufferType.STORE) {
-            bus.addToWritebackQueue(new BusData(tag, new Q(Q.DataType.R, value)), enterTime);
+
+
+    public void clearCurrentStation(){
+        if (bus.getBusData().tag == this.tag){
+            clear();
         }
     }
+
 
     public void runCycle() {
         if (executed && !addedToWriteBackQueue) {
-            broadcastResult();
+            bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.L, value)), enterTime);
             addedToWriteBackQueue = true;
+
         } else if (busy) {
             executeCycle();
         }
+        clearCurrentStation();
     }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -344,13 +146,18 @@ public class Buffer {
         sb.append("Type: ").append(type).append("\n");
         sb.append("Busy: ").append(busy).append("\n");
         sb.append("Value: ").append(value != null ? value : "None").append("\n");
-        sb.append("Value Source Tag: ").append(valueSourceTag != null ? valueSourceTag : "None").append("\n");
-        sb.append("Address Tag: ").append(addressTag != null ? addressTag : "None").append("\n");
+        sb.append("Address  Tag: ").append(addressTag != null ? addressTag : "None").append("\n");
+        sb.append("Destination Tag: ").append(destination != null ? destination : "None").append("\n");
         sb.append("Address Ready: ").append(addressReady).append("\n");
-        sb.append("Cycles Remaining: ").append(cycles > 0 ? cycles : "Execution Complete").append("\n");
+        if (cycles > -1) {
+            sb.append("Cycles Remaining: ").append(cycles).append("\n");
+        } else if (executed) {
+            sb.append("Cycles Remaining: Execution Complete\n");
+        } else {
+            sb.append("Cycles Remaining: Not Started\n");
+        }
         sb.append("Executed: ").append(executed).append("\n");
         sb.append("Added to WriteBack Queue: ").append(addedToWriteBackQueue).append("\n");
         return sb.toString();
     }
-
 }
