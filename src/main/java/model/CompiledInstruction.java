@@ -1,19 +1,13 @@
 package model;
 
 public class CompiledInstruction {
-//    public enum InstructionType {
-//        FP_ADD,     // ADD.D, SUB.D
-//        FP_MULT,    // MUL.D, DIV.D
-//        INT_ADD,    // ADDI, SUBI
-//        LOAD,       // L.D, LW
-//        STORE,      // S.D, SW
-//        BRANCH      // BEQ, BNE
-//    }
 
     Operation operation; //needed for rs communication
     Tag destination;
     Tag source1;
     Tag source2;
+
+
 
     public CompiledInstruction(Operation operation, Tag destination, Tag source1, Tag source2) {
         this.operation = operation;
@@ -22,13 +16,22 @@ public class CompiledInstruction {
         this.source2 = source2;
     }
 
-
-    public String toString() {
-        return operation + " " + destination + " " + source1 + " " + source2 + "\n";
-    }
-
-
     public Operation getOperation() {
         return operation;
+    }
+
+    public Tag getDestination() {
+        return destination;
+    }
+
+    public Tag getSource1() {
+        return source1;
+    }
+
+    public Tag getSource2() {
+        return source2;
+    }
+    public String toString() {
+        return operation + " " + destination + " " + source1 + " " + source2 + "\n";
     }
 }

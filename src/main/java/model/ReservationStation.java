@@ -234,13 +234,11 @@ public class ReservationStation {
         BusData busData = bus.getBusData();
         if(QAndTagCompare(qj, busData.tag)){
             vj = busData.dataValue.value;
-            qj.type = Q.DataType.R;
-            qj.value = 0;
+            qj = new Q(Q.DataType.R, 0);
         }
         if(QAndTagCompare(qk, busData.tag)){
             vk = busData.dataValue.value;
-            qk.type = Q.DataType.R;
-            qk.value = 0;
+            qk = new Q(Q.DataType.R, 0);
         }
     }
 
