@@ -66,6 +66,9 @@ public class ReservationStation {
     private double vj; //first operand
     private double vk; //second operand
 
+    public Operation getOperation() {
+        return operation;
+    }
     public double getVj() {
         return vj;
     }

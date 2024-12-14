@@ -92,4 +92,12 @@ public class RegisterFile {
         return sb.toString();
     }
 
+    public int getSize() {
+        return qi.length;
+    }
+
+    public Q[] getRegisters() {
+        return qi;
+    }
+
 }

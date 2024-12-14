@@ -156,4 +156,8 @@ public class BufferManager {
         }
         return sb.toString();
     }
+
+    public Buffer[] getBuffers() {
+        return buffers;
+    }
 }

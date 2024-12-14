@@ -10,7 +10,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import model.TomasuloEngine;
+import model.*;
+import javafx.scene.Node;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class TomasuloTables extends Application {
 
     private int cycle = 0;
     private Label cycleLabel;
+    private VBox tablesContainer;
 
     @Override
     public void start(Stage primaryStage) {
@@ -44,22 +46,26 @@ public class TomasuloTables extends Application {
         nextCycleButton.setOnAction(e -> incrementCycle());
         cycleControls.getChildren().addAll(cycleLabel, nextCycleButton);
 
-        // Tables Container
-        VBox tablesContainer = new VBox(20);
+        // Tables Container (with ScrollPane)
+        tablesContainer = new VBox(20);
+        ScrollPane scrollPane = new ScrollPane(tablesContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: #f4f4f9;");
 
         // Create tables
         tablesContainer.getChildren().add(createInstructionQueueTable());
-
         tablesContainer.getChildren().add(createReservationStationTable("ADD/SUB Reservation Stations", TomasuloEngine.additionUnitStations));
         tablesContainer.getChildren().add(createReservationStationTable("MUL/DIV Reservation Stations", TomasuloEngine.multiplicationUnitStations));
         tablesContainer.getChildren().add(createBufferTable("Load Buffers", TomasuloEngine.loadUnitBuffer));
         tablesContainer.getChildren().add(createBufferTable("Store Buffers", TomasuloEngine.storeUnitBuffer));
+        tablesContainer.getChildren().add(createRegisterFileTable("Floating Point Registers", TomasuloEngine.fp_registerFile));
+        tablesContainer.getChildren().add(createRegisterFileTable("Integer Registers", TomasuloEngine.int_registerFile));
 
         // Assemble layout
-        container.getChildren().addAll(title, cycleControls, tablesContainer);
+        container.getChildren().addAll(title, cycleControls, scrollPane);
 
         // Scene and stage
-        Scene scene = new Scene(container, 1000, 800);
+        Scene scene = new Scene(container, 1200, 900); // Increased window size
         primaryStage.setTitle("Tomasulo Algorithm Tables");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -70,6 +76,7 @@ public class TomasuloTables extends Application {
         cycleLabel.setText("Cycle: " + cycle);
 
         // Update data in tables from TomasuloEngine
+        TomasuloEngine.runCycle();
         refreshTables();
     }
 
@@ -79,11 +86,9 @@ public class TomasuloTables extends Application {
         sectionTitle.setFont(Font.font("Arial", 18));
         sectionTitle.setTextFill(Color.web("#555"));
 
-        // Create TableView for Instruction Queue
         TableView<String[]> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Define columns for the Instruction Queue
         String[] columns = {"Instruction Number", "Instruction"};
         for (String columnTitle : columns) {
             TableColumn<String[], String> column = new TableColumn<>(columnTitle);
@@ -94,27 +99,11 @@ public class TomasuloTables extends Application {
             table.getColumns().add(column);
         }
 
-        // Populate the table with instruction queue data
         refreshInstructionQueueTable(table);
 
         section.getChildren().addAll(sectionTitle, table);
         return section;
     }
-
-    private void refreshInstructionQueueTable(TableView<String[]> table) {
-        table.getItems().clear();
-
-        // Fetch instructions from TomasuloEngine's InstructionQueue
-        List<String[]> instructionQueueData = TomasuloEngine.getInstructionQueueData();
-
-        // Add each instruction to the table
-        for (String[] row : instructionQueueData) {
-            table.getItems().add(row);
-        }
-    }
-
-
-
 
     private VBox createReservationStationTable(String title, Object stationManager) {
         VBox section = new VBox(10);
@@ -135,7 +124,6 @@ public class TomasuloTables extends Application {
             table.getColumns().add(column);
         }
 
-        // Fetch and populate data from TomasuloEngine
         refreshReservationStationTable(table, stationManager);
 
         section.getChildren().addAll(sectionTitle, table);
@@ -161,27 +149,131 @@ public class TomasuloTables extends Application {
             table.getColumns().add(column);
         }
 
-        // Fetch and populate data from TomasuloEngine
         refreshBufferTable(table, bufferManager);
 
         section.getChildren().addAll(sectionTitle, table);
         return section;
     }
 
-    private void refreshTables() {
-        // Implement table refreshing logic here, fetching updated data from TomasuloEngine
+    private VBox createRegisterFileTable(String title, RegisterFile registerFile) {
+        VBox section = new VBox(10);
+        Label sectionTitle = new Label(title);
+        sectionTitle.setFont(Font.font("Arial", 18));
+        sectionTitle.setTextFill(Color.web("#555"));
+
+        TableView<String[]> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        String[] columns = {"Register", "Q", "Value"};
+        for (String columnTitle : columns) {
+            TableColumn<String[], String> column = new TableColumn<>(columnTitle);
+            column.setCellValueFactory(data -> {
+                int index = table.getColumns().indexOf(column);
+                return new SimpleStringProperty(data.getValue()[index]);
+            });
+            table.getColumns().add(column);
+        }
+
+        refreshRegisterFileTable(table, registerFile);
+        section.getChildren().addAll(sectionTitle, table);
+        return section;
     }
 
-    private void refreshSimulationTable(TableView<String[]> table) {
-        // Fetch simulation data from TomasuloEngine and populate the table
+    private void refreshTables() {
+        for (Node node : tablesContainer.getChildren()) {
+            if (node instanceof VBox) {
+                VBox section = (VBox) node;
+                for (Node child : section.getChildren()) {
+                    if (child instanceof TableView) {
+                        TableView<String[]> table = (TableView<String[]>) child;
+                        String title = ((Label) section.getChildren().get(0)).getText();
+
+                        switch (title) {
+                            case "Instruction Queue":
+                                refreshInstructionQueueTable(table);
+                                break;
+                            case "ADD/SUB Reservation Stations":
+                                refreshReservationStationTable(table, TomasuloEngine.additionUnitStations);
+                                break;
+                            case "MUL/DIV Reservation Stations":
+                                refreshReservationStationTable(table, TomasuloEngine.multiplicationUnitStations);
+                                break;
+                            case "Load Buffers":
+                                refreshBufferTable(table, TomasuloEngine.loadUnitBuffer);
+                                break;
+                            case "Store Buffers":
+                                refreshBufferTable(table, TomasuloEngine.storeUnitBuffer);
+                                break;
+                            case "Floating Point Registers":
+                                refreshRegisterFileTable(table, TomasuloEngine.fp_registerFile);
+                                break;
+                            case "Integer Registers":
+                                refreshRegisterFileTable(table, TomasuloEngine.int_registerFile);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void refreshInstructionQueueTable(TableView<String[]> table) {
+        table.getItems().clear();
+        List<String[]> instructionQueueData = TomasuloEngine.getInstructionQueueData();
+        for (String[] row : instructionQueueData) {
+            table.getItems().add(row);
+        }
     }
 
     private void refreshReservationStationTable(TableView<String[]> table, Object stationManager) {
-        // Fetch reservation station data from TomasuloEngine and populate the table
+        table.getItems().clear(); // Clear the table before adding updated data
+
+        ReservationStationManager manager = (ReservationStationManager) stationManager;
+        ReservationStation[] stations = manager.getStations();
+
+        for (ReservationStation rs : stations) {
+            String[] row = {
+                    rs.getTag() != null ? rs.getTag().toString() : "",
+                    String.valueOf(rs.isBusy()),
+                    rs.getOperation() != null ? rs.getOperation().toString() : "",
+                    rs.getVj() != -1 ? String.valueOf(rs.getVj()) : "",
+                    rs.getVk() != -1 ? String.valueOf(rs.getVk()) : "",
+                    rs.getQj() != null ? rs.getQj().toString() : "",
+                    rs.getQk() != null ? rs.getQk().toString() : ""
+            };
+
+            if (rs.isBusy() || rs.getOperation() != null || rs.getQj() != null || rs.getQk() != null) {
+                table.getItems().add(row);
+            }
+        }
     }
 
     private void refreshBufferTable(TableView<String[]> table, Object bufferManager) {
-        // Fetch buffer data from TomasuloEngine and populate the table
+        table.getItems().clear();
+        BufferManager manager = (BufferManager) bufferManager;
+        Buffer[] buffers = manager.getBuffers();
+        for (Buffer buffer : buffers) {
+            String[] row = {
+                    buffer.getTag().toString(),
+                    String.valueOf(buffer.isBusy()),
+                    buffer.getAddressTag() != null ? buffer.getAddressTag().toString() : ""
+            };
+            table.getItems().add(row);
+        }
+    }
+
+    private void refreshRegisterFileTable(TableView<String[]> table, RegisterFile registerFile) {
+        table.getItems().clear();
+
+        for (int i = 0; i < registerFile.getRegisters().length; i++) {
+            Q value = registerFile.getRegisters()[i];
+            String[] row = {
+                    "R" + i,
+                    value.type != Q.DataType.R ? value.type.name() : "",
+                    String.valueOf(value.value)
+            };
+            table.getItems().add(row);
+        }
     }
 
     public static void main(String[] args) {

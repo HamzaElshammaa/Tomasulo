@@ -1,4 +1,3 @@
-
 package model;
 
 public class Buffer {
@@ -159,5 +158,9 @@ public class Buffer {
         sb.append("Executed: ").append(executed).append("\n");
         sb.append("Added to WriteBack Queue: ").append(addedToWriteBackQueue).append("\n");
         return sb.toString();
+    }
+
+    public Tag getAddressTag() {
+        return addressTag;
     }
 }

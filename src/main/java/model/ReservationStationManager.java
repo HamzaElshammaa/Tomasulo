@@ -152,6 +152,9 @@ public class ReservationStationManager {
         return true;
     }
 
+    public ReservationStation[] getStations() {
+        return reservationStations;
+    }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();

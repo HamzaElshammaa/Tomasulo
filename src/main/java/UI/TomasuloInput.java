@@ -18,6 +18,7 @@ public class TomasuloInput extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         VBox container = new VBox(20);
         container.setPadding(new Insets(20));
         container.setStyle("-fx-background-color: #f4f4f9;");
@@ -60,7 +61,6 @@ public class TomasuloInput extends Application {
 
             // Start the TomasuloTables screen
             TomasuloEngine.init();
-
 
             try {
                 new TomasuloTables().start(new Stage());
