@@ -57,14 +57,23 @@ public class TomasuloEngine {
         String filePath = "D:\\Uni\\Semester 7\\Microprocessors\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         //String filePath = "C:\\Sem 7\\Microprocessors\\simulationProject\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         // Load raw instructions from the file
-        List<String> rawInstructions = InstructionQueue.loadRawInstructions(filePath);
+        List<String> rawInstructions = InstructionQueue.loadRawInstructions(filePath, 0);
 
         // loading instructions into queue
-        instructionQueue = new InstructionQueue(rawInstructions);
+        instructionQueue = new InstructionQueue(rawInstructions, bus, fp_registerFile, int_registerFile, false);
 
     }
 
     public static void fetchInstruction(){
+        if (instructionQueue.isBranching()){
+            List<String> loopInstructions = instructionQueue.updateOperands();
+            if (!loopInstructions.isEmpty()){
+                instructionQueue.clear();
+                instructionQueue.append(loopInstructions);
+            }
+            return;
+        }
+
         CompiledInstruction issuedInstruction = instructionQueue.fetchNextInstruction();
         if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_ADD) || issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_SUB)){
             additionUnitStations.issueInstruction(issuedInstruction);
@@ -78,47 +87,61 @@ public class TomasuloEngine {
         if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.STORE)){
             storeUnitBuffer.issueInstruction(issuedInstruction);
         }
+        if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.BNE)){
+            //BNE
+            instructionQueue.BNE(issuedInstruction.getDestination(), issuedInstruction.getSource1(), issuedInstruction.getSource2());
+        }
+        if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.BEQ)){
+            //BEQ
+            instructionQueue.BEQ(issuedInstruction.getDestination(), issuedInstruction.getSource1(), issuedInstruction.getSource2());
+        }
+    }
+
+    public static void runCycle(){
+        System.out.println("------------------------------------------------------------------------------------------- \n");
+        System.out.println("\n" + "Clock Cycle: " + clock.getCycle());
+
+        if(clock.getCycle() == 0){
+            clock.increment();
+            return;
+        }
+        try{
+            fetchInstruction();
+
+        }catch(Exception e){
+            System.out.println("No more instructions to be fetched");
+        }
+
+        additionUnitStations.runCycle();
+        multiplicationUnitStations.runCycle();
+        bus.writeBackNext();
+
+        System.out.println("ADD RS \n" + additionUnitStations);
+        System.out.println("////// \n");
+        System.out.println("MULT RS \n" + multiplicationUnitStations);
+
+        System.out.println("bus current: " + bus);
+
+        fp_registerFile.updateRegisterFile();
+        int_registerFile.updateRegisterFile();
+
+        System.out.println(fp_registerFile);
+
+        System.out.println("------------------------------------------------------------------------------------------- \n");
+        clock.increment();
+    }
+
+    public static boolean isDone(){
+        return (instructionQueue.isEmpty() &&
+                additionUnitStations.allEmpty() &&
+                multiplicationUnitStations.allEmpty());
     }
 
     public static void main (String[] args) {
         init();
-        int i = 0;
-        while(i < 21){
-            i++;
+        while(!isDone()){
+            runCycle();
 
-            System.out.println("------------------------------------------------------------------------------------------- \n");
-            System.out.println("\n" + "Clock Cycle: " + clock.getCycle());
-
-            if(clock.getCycle() == 0){
-                clock.increment();
-                continue;
-            }
-            try{
-                fetchInstruction();
-
-            }catch(Exception e){
-                System.out.println("No more instructions to be fetched");
-            }
-
-            additionUnitStations.runCycle();
-            multiplicationUnitStations.runCycle();
-            bus.writeBackNext();
-
-            System.out.println("ADD RS \n" + additionUnitStations);
-            System.out.println("////// \n");
-            System.out.println("MULT RS \n" + multiplicationUnitStations);
-
-            System.out.println("bus current: " + bus);
-
-            fp_registerFile.updateRegisterFile();
-            int_registerFile.updateRegisterFile();
-
-            System.out.println(fp_registerFile);
-
-            System.out.println("------------------------------------------------------------------------------------------- \n");
-
-
-            clock.increment();
         }
     }
 

@@ -14,6 +14,8 @@ public class Operation {
         FP_SUB,
         FP_MULT,
         FP_DIV,
+        BNE,
+        BEQ
     }
 
     public OperationType operationType;

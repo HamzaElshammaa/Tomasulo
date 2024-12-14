@@ -206,6 +206,8 @@ public class ReservationStation {
             }
 
         resultReady = true;
+        bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
+        addedToWriteBackQueue = true;
     }
 
     public static boolean QAndTagCompare(Q q, Tag tag) {
@@ -248,8 +250,8 @@ public class ReservationStation {
 
     public void runCycle(){
         if (resultReady && !addedToWriteBackQueue){
-            bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
-            addedToWriteBackQueue = true;
+//            bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
+//            addedToWriteBackQueue = true;
         }
         else{
             if (busy){
