@@ -1,4 +1,5 @@
 import model.*;
+import model.DataMemory;
 
 import java.sql.SQLOutput;
 import java.util.List;
@@ -7,10 +8,10 @@ import java.util.List;
 
 public class TomasuloEngine {
     //memory variables
-    static int blockSize = 100;
-    static int cacheSize = 100;
+    static int blockSize = 2;
+    static int cacheSize = 6;
     static int missPenalty = 10;
-    static int memorySize = 1000;
+    static int memorySize = 8;
 
     //Bus
     public static Bus bus = new Bus();
@@ -29,19 +30,22 @@ public class TomasuloEngine {
     //DataMemory
     static DataMemory dataMemory = new DataMemory(memorySize,cache);
 
+
+
+
     public static InstructionQueue instructionQueue;
 
     //latencies
     static int additionUnitLatency = 4; //for FP ADD & SUB
     static int multiplicationUnitLatency = 6; //for FP MUL & DIV
-    static int loadUnitLatency = 1;
-    static int storeUnitLatency = 1;
+    static int loadUnitLatency = 2;
+    static int storeUnitLatency = 3;
 
     //RS sizes
     static int additionUnitSize = 3;
     static int multiplicationUnitSize = 2;
-    static int loadUnitSize = 3;
-    static int storeUnitSize = 3;
+    static int loadUnitSize = 1;
+    static int storeUnitSize = 1;
 
     //RS
     static ReservationStationManager additionUnitStations = new ReservationStationManager(ReservationStation.Type.ADD,additionUnitSize, additionUnitLatency,fp_registerFile, int_registerFile, bus, clock);
@@ -55,12 +59,15 @@ public class TomasuloEngine {
 
     public static void init(){
 //        String filePath = "D:\\Uni\\Semester 7\\Microprocessors\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
-        String filePath = "C:\\Sem 7\\Microprocessors\\simulationProject\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
+        String filePath = "C:\\Users\\mozam\\OneDrive\\Uni\\Semester 7\\CSEN702 Microprocessors\\Micro Project 2\\Tomasulo\\src\\main\\java\\model\\instructions.txt";
         // Load raw instructions from the file
         List<String> rawInstructions = InstructionQueue.loadRawInstructions(filePath);
 
         // loading instructions into queue
         instructionQueue = new InstructionQueue(rawInstructions);
+        for (int address = 0; address < memorySize; address++) {
+            dataMemory.store(address, 700.0);
+        }
 
     }
 
@@ -83,7 +90,7 @@ public class TomasuloEngine {
     public static void main (String[] args) {
         init();
         int i = 0;
-        while(i < 21){
+        while(i < 10){
             i++;
 
             System.out.println("------------------------------------------------------------------------------------------- \n");
@@ -102,14 +109,21 @@ public class TomasuloEngine {
 
             additionUnitStations.runCycle();
             multiplicationUnitStations.runCycle();
+            loadUnitBuffer.runCycle();
+            storeUnitBuffer.runCycle();
 
-            System.out.println("ADD RS \n" + additionUnitStations);
-            System.out.println("////// \n");
-            System.out.println("MULT RS \n" + multiplicationUnitStations);
+            //System.out.println("ADD RS \n" + additionUnitStations);
+            //System.out.println("////// \n");
+            //System.out.println("MULT RS \n" + multiplicationUnitStations);
+           System.out.println("LOAD BF \n"+ loadUnitBuffer);
 
             bus.writeBackNext();
             System.out.println("bus current: " + bus);
             System.out.println(fp_registerFile);
+            System.out.println(int_registerFile);
+            //System.out.println(cache);
+            //System.out.println(dataMemory);
+
 
             fp_registerFile.updateRegisterFile();
             int_registerFile.updateRegisterFile();
