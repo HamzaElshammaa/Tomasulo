@@ -11,9 +11,9 @@ public class CompiledInstruction {
 //    }
 
     Operation operation; //needed for rs communication
-    Tag destination;
-    Tag source1;
-    Tag source2;
+    public Tag destination;
+    public Tag source1;
+    public Tag source2;
 
     public CompiledInstruction(Operation operation, Tag destination, Tag source1, Tag source2) {
         this.operation = operation;

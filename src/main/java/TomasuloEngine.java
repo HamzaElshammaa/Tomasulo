@@ -60,13 +60,17 @@ public class TomasuloEngine {
         List<String> rawInstructions = InstructionQueue.loadRawInstructions(filePath);
 
         // loading instructions into queue
-        instructionQueue = new InstructionQueue(rawInstructions);
+        instructionQueue = new InstructionQueue(rawInstructions, bus, fp_registerFile, int_registerFile);
 
     }
 
     public static void fetchInstruction(){
+        if (instructionQueue.isBranching()){
+            instructionQueue.updateOperands();
+            return;
+        }
         CompiledInstruction issuedInstruction = instructionQueue.fetchNextInstruction();
-        if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_ADD) || issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_SUB)){
+        if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_ADD) || issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_SUB ) || issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.SUB)){
             additionUnitStations.issueInstruction(issuedInstruction);
         }
         if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_DIV) || issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.FP_MULT)){
@@ -78,13 +82,15 @@ public class TomasuloEngine {
         if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.STORE)){
             storeUnitBuffer.issueInstruction(issuedInstruction);
         }
+        if(issuedInstruction.getOperation().isOperationEqual(Operation.OperationType.BNE)){
+            instructionQueue.BNE(issuedInstruction.destination, issuedInstruction.source1, issuedInstruction.source2.index);
+        }
     }
 
     public static void main (String[] args) {
         init();
         int i = 0;
-        while(i < 21){
-            i++;
+        while(!(instructionQueue.isEmpty() && additionUnitStations.allEmpty() && multiplicationUnitStations.allEmpty())){
 
             System.out.println("------------------------------------------------------------------------------------------- \n");
             System.out.println("\n" + "Clock Cycle: " + clock.getCycle());
