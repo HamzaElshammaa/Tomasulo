@@ -129,23 +129,27 @@ public class ReservationStation {
         Q operand1;
         Q operand2;
         if (instruction.source1.source == FP_REG){
-            operand1 = fp_registerFile.getRegister(instruction.source1.index);
+            Q current = fp_registerFile.getRegister(instruction.source1.index);
+            operand1 = new Q(current.type, current.value);
         }
         else if (instruction.source1.source == IMM){
-            operand1 = new Q(Q.DataType.R, instruction.source2.index);
+            operand1 = new Q(Q.DataType.R, instruction.source1.index);
         }
         else {
-            operand1 = int_registerFile.getRegister(instruction.source1.index);
+            Q current = int_registerFile.getRegister(instruction.source1.index);
+            operand1 = new Q(current.type, current.value);
         }
 
         if (instruction.source2.source == FP_REG){
-            operand2 = fp_registerFile.getRegister(instruction.source2.index);
+            Q current = fp_registerFile.getRegister(instruction.source2.index);
+            operand2 = new Q(current.type, current.value);
         }
         else if (instruction.source2.source == IMM){
             operand2 = new Q(Q.DataType.R, instruction.source2.index);
         }
         else {
-            operand2 = int_registerFile.getRegister(instruction.source2.index);
+            Q current = int_registerFile.getRegister(instruction.source2.index);
+            operand2 = new Q(current.type, current.value);
         }
 
         if (operand1.type == Q.DataType.R){
@@ -168,12 +172,12 @@ public class ReservationStation {
 
 
     public void executeCycle(){
-        if(!isReadyToExecute() || cycles <= 0){
+        if(!isReadyToExecute() || cycles <= -1){
             return;
         }
         cycles--;
         // if last cycle compute the result
-        if(cycles == 0){
+        if(cycles == -1){
             computeResult();
         }
     }
@@ -202,6 +206,8 @@ public class ReservationStation {
         }
 
         resultReady = true;
+        bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
+        addedToWriteBackQueue = true;
     }
 
     public static boolean QAndTagCompare(Q q, Tag tag) {
@@ -246,8 +252,8 @@ public class ReservationStation {
 
     public void runCycle(){
         if (resultReady && !addedToWriteBackQueue){
-            bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
-            addedToWriteBackQueue = true;
+//            bus.addToWritebackQueue(new BusData(this.tag, new Q(Q.DataType.R, result)), enterTime);
+//            addedToWriteBackQueue = true;
         }
         else{
             if (busy){
