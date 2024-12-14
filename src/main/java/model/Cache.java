@@ -163,4 +163,33 @@ public class Cache {
             this.missLatency = missLatency;
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Cache State:\n");
+        for (int i = 0; i < numberOfBlocks; i++) {
+            CacheBlock block = blocks[i];
+            sb.append("Block[").append(i).append("] -> ");
+            if (block.valid) {
+                sb.append("Valid: true, Tag: ").append(block.tag);
+                // Display the block's data
+                sb.append(", Data: [");
+                int blockStartAddress = i * blockSize;
+                for (int j = 0; j < blockSize; j++) {
+                    int address = blockStartAddress + j;
+                    double value = getValueFromMainMemory(address);
+                    sb.append(value);
+                    if (j < blockSize - 1) {
+                        sb.append(", ");
+                    }
+                }
+                sb.append("]");
+            } else {
+                sb.append("Valid: false");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

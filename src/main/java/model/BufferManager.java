@@ -3,8 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import static model.Tag.Source.L;
-import static model.Tag.Source.S;
+import static model.Tag.Source.*;
 
 public class BufferManager {
     public static class IssueData{
@@ -22,7 +21,7 @@ public class BufferManager {
     private final Buffer[] buffers;
     private final List<IssueData> waitingInstructions;
     private final RegisterFile fp_registerFile;
-    private final RegisterFile int_registerFiles;
+    private final RegisterFile int_registerFile;
     private final Bus bus;
     private final Clock clock;
     private DataMemory dataMemory;
@@ -32,7 +31,7 @@ public class BufferManager {
         this.bufferType = type;
         this.buffers = new Buffer[numberOfBuffers];
         this.fp_registerFile = fpRegisterFile;
-        this.int_registerFiles = intRegisterFile;
+        this.int_registerFile = intRegisterFile;
         this.bus = bus;
         this.clock = clock;
         this.waitingInstructions = new ArrayList<>();
@@ -54,17 +53,30 @@ public class BufferManager {
     }
 
     //Attempt to issue instruction from waiting list
-    public void attemptToIssueInstructions(){
+    public void attemptToIssueInstructions() {
         List<IssueData> issuedInstructions = new ArrayList<>();
 
-        //iterate over waiting instructions
-        for(IssueData instruction : waitingInstructions){
+        // Iterate over waiting instructions
+        for (IssueData instruction : waitingInstructions) {
             Buffer freeBuff = findFreeBuffer();
-            if(freeBuff != null){
-                //Issue to free buffer
+            if (freeBuff != null) {
+                // Issue to free buffer
                 freeBuff.issue(instruction.instruction, instruction.enteredCycle);
-                //mark buffer as busy and remove instruction from waiting list
+                // Mark buffer as busy and remove instruction from waiting list
                 issuedInstructions.add(instruction);
+
+                // Only for LOAD instructions, we need to update the register file
+                if (freeBuff.getType() == Buffer.BufferType.LOAD) {
+                    Tag destination = instruction.instruction.destination;
+                    Q bufferTag = transformTagToQ(freeBuff.getTag());
+
+                    // Update the appropriate register file based on destination type
+                    if (destination.source == Tag.Source.FP_REG) {
+                        fp_registerFile.setRegister(destination.index, bufferTag);
+                    } else if (destination.source == Tag.Source.REG) {
+                        int_registerFile.setRegister(destination.index, bufferTag);
+                    }
+                }
             }
         }
         waitingInstructions.removeAll(issuedInstructions);
@@ -79,7 +91,20 @@ public class BufferManager {
         return null; // no free stations
     }
 
-    public void executeCycle(){
+    public Q transformTagToQ(Tag tag) {
+        if (tag == null) {
+            throw new IllegalArgumentException("Tag cannot be null");
+        }
+
+        return switch (tag.source) {
+            case L -> // Waiting for load
+                    new Q(Q.DataType.L, tag.index);
+            default -> throw new IllegalArgumentException("Unknown Tag source: " + tag.source);
+        };
+    }
+
+
+        public void executeCycle(){
     for(Buffer buffer : buffers){
     buffer.executeCycle();}
     //Attempt to issue instructions
@@ -110,5 +135,15 @@ public class BufferManager {
         for(Buffer buffer : buffers){
             buffer.runCycle();
         }
+    }
+
+
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Buffer bf : buffers) {
+            sb.append(bf.toString());
+        }
+        return sb.toString();
     }
 }

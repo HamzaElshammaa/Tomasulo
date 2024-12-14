@@ -1,7 +1,6 @@
 package model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DataMemory {
     private final int size;                          // Memory size in bytes
@@ -136,4 +135,28 @@ public class DataMemory {
             this.busy = busy;
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Data Memory State:\n");
+
+        // Sort the addresses for consistent display
+        List<Integer> sortedAddresses = new ArrayList<>(memory.keySet());
+        Collections.sort(sortedAddresses);
+
+        for (Integer address : sortedAddresses) {
+            sb.append("Address[").append(address).append("] -> ");
+            sb.append("Value: ").append(memory.getOrDefault(address, 0.0));
+            sb.append(", Busy: ").append(isBusy(address));
+            sb.append("\n");
+        }
+
+        if (sortedAddresses.isEmpty()) {
+            sb.append("Memory is empty\n");
+        }
+
+        return sb.toString();
+    }
+
+
 }
